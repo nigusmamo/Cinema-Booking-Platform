@@ -1,0 +1,10 @@
+table:
+  name: booking_seats
+  schema: public
+object_relationships:
+  - name: booking
+    using:
+      foreign_key_constraint_on: booking_id
+  - name: seat
+    using:
+      foreign_key_constraint_on: seat_id
