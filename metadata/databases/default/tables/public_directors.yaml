@@ -1,0 +1,11 @@
+table:
+  name: directors
+  schema: public
+array_relationships:
+  - name: movie_directors
+    using:
+      foreign_key_constraint_on:
+        column: director_id
+        table:
+          name: movie_directors
+          schema: public

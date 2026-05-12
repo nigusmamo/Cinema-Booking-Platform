@@ -1,0 +1,18 @@
+table:
+  name: schedules
+  schema: public
+object_relationships:
+  - name: hall
+    using:
+      foreign_key_constraint_on: hall_id
+  - name: movie
+    using:
+      foreign_key_constraint_on: movie_id
+array_relationships:
+  - name: bookings
+    using:
+      foreign_key_constraint_on:
+        column: schedule_id
+        table:
+          name: bookings
+          schema: public
