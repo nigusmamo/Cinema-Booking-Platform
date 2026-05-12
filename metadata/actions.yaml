@@ -1,6 +1,16 @@
-actions: []
+actions:
+  - name: login
+    definition:
+      kind: synchronous
+      handler: http://host.docker.internal:8000/auth/login
+  - name: signup
+    definition:
+      kind: synchronous
+      handler: http://host.docker.internal:8000/auth/signup
 custom_types:
   enums: []
   input_objects: []
-  objects: []
+  objects:
+    - name: SignupOutput
+    - name: LoginOutput
   scalars: []
