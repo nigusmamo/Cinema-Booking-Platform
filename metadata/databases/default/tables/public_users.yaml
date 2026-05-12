@@ -23,3 +23,18 @@ array_relationships:
         table:
           name: ratings
           schema: public
+select_permissions:
+  - role: user
+    permission:
+      columns:
+        - created_at
+        - email
+        - full_name
+        - id
+        - password
+        - role
+        - updated_at
+      filter:
+        id:
+          _eq: X-Hasura-User-Id
+    comment: ""
