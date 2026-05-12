@@ -22,3 +22,17 @@ type LoginRequest struct {
 	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password" binding:"required"`
 }
+
+type SignupActionPayload struct {
+	Action struct {
+		Name string `json:"name"`
+	} `json:"action"`
+	Input SignupRequest `json:"input"`
+}
+
+type LoginActionPayload struct {
+	Action struct {
+		Name string `json:"name"`
+	} `json:"action"`
+	Input LoginRequest `json:"input"`
+}

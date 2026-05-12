@@ -8,43 +8,43 @@ import (
 )
 
 func SignupHandler(c *gin.Context) {
-	var req models.SignupRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad Request"})
+	var payload models.SignupActionPayload
+	
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid request body"})
 		return
 	}
 
-	user, err := services.RegisterUser(req)
+	user, err := services.RegisterUser(payload.Input)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Registration successful",
-		"user": user,
+		"id":        user.ID,
+		"full_name": user.FullName,
+		"email":     user.Email,
 	})
 }
 
 func LoginHandler(c *gin.Context) {
-	var req models.LoginRequest
+	var payload models.LoginActionPayload
 
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid email or password"})
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid request body"})
 		return
 	}
 
-	token, user, err := services.LoginUser(req)
+	token, user, err := services.LoginUser(payload.Input)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		c.JSON(http.StatusUnauthorized, gin.H{"message": err.Error()})
 		return
 	}
-
-	user.Password = ""
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Login successful",
-		"token":   token,
-		"user":    user,
+		"token":     token,
+		"id":        user.ID,
+		"full_name": user.FullName,
 	})
 }
