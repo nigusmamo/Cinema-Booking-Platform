@@ -10,7 +10,6 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@apollo/client": "^3.14.1",
     "@nuxtjs/apollo": "^5.0.0-alpha.16",
     "@vee-validate/rules": "^4.15.1",
     "graphql": "^16.14.0",
