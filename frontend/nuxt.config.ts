@@ -2,8 +2,6 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-05-14',
 
-  srcDir: 'app/',
-
   future: {
     compatibilityVersion: 4, 
   },
