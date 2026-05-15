@@ -32,7 +32,6 @@
       </div>
     </section>
 
-
     <div class="max-w-7xl mx-auto px-4 -mt-20 relative z-20">
       <div class="bg-[#121212]/95 backdrop-blur-xl border border-white/5 p-8 rounded-[40px] shadow-2xl">
         
@@ -97,7 +96,7 @@
           :image="movie.main_image"
           :duration="movie.duration_minutes"
           :rating="movie.rating_avg"
-          @click="navigateTo(`/movies/${movie.id}`)"
+          @click="navigateTo(`/movies/${movie.id}`)" 
         />
       </div>
 

@@ -29,3 +29,37 @@ export const GET_HOME_PAGE_DATA = gql`
     }
   }
 `;
+
+export const GET_MOVIE_DETAILS = gql`
+  query GetMovieDetails($id: uuid!) {
+    movies_by_pk(id: $id) {
+      id
+      title
+      description
+      main_image
+      duration_minutes
+      rating_avg
+      release_date
+      status
+      movie_images {
+        id
+        image_url
+      }
+      movie_directors {
+        director {
+          name
+        }
+      }
+      movie_stars {
+        star {
+          name
+        }
+      }
+      movie_genres {
+        genre {
+          name
+        }
+      }
+    }
+  }
+`;
