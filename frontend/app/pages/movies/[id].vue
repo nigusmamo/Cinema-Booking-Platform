@@ -86,7 +86,8 @@
                 </button>
              </div>
 
-             <button @click="navigateTo('/booking/seats')" class="w-full bg-[#EAB308] text-black py-5 rounded-[22px] font-black text-sm shadow-xl shadow-[#EAB308]/20 hover:scale-[1.02] active:scale-95 transition-all">
+             <button @click="navigateTo(`/booking/seats?id=${movie.id}`)" 
+               class="w-full bg-[#EAB308] text-black py-5 rounded-[22px] font-black text-sm shadow-xl shadow-[#EAB308]/20 hover:scale-[1.02] active:scale-95 transition-all">
                SELECT SEATS
              </button>
           </div>

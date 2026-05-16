@@ -6,7 +6,6 @@
     
     <div class="p-4 bg-gradient-to-t from-black to-transparent">
       <div class="flex items-center gap-2 mb-1">
-        <span class="text-[10px] bg-primary text-black px-1.5 py-0.5 rounded font-bold">IMAX</span>
         <span class="text-text-soft text-xs">{{ duration }} min</span>
       </div>
       <h3 class="font-bold text-lg leading-tight truncate">{{ title }}</h3>
