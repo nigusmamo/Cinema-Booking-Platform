@@ -63,3 +63,21 @@ export const GET_MOVIE_DETAILS = gql`
     }
   }
 `;
+
+export const GET_MOVIE_SCHEDULES = gql`
+  query GetMovieSchedules {
+    movies(order_by: {created_at: desc}) {
+      id
+      title
+      description
+      main_image
+      duration_minutes
+      rating_avg
+      movie_genres {
+        genre {
+          name
+        }
+      }
+    }
+  }
+`;

@@ -7,10 +7,9 @@
         </NuxtLink>
 
         <div class="hidden lg:flex items-center gap-8 text-[13px] font-bold tracking-widest text-gray-400">
-          <NuxtLink to="/" class="hover:text-[#EAB308] transition text-white">MOVIES</NuxtLink>
+          <NuxtLink to="/" class="hover:text-[#EAB308] transition text-white">HOME</NuxtLink>
           <NuxtLink to="/schedules" class="hover:text-[#EAB308] transition">SCHEDULES</NuxtLink>
-          <NuxtLink to="/cinemas" class="hover:text-[#EAB308] transition">CINEMAS</NuxtLink>
-          <NuxtLink to="/offers" class="hover:text-[#EAB308] transition">OFFERS</NuxtLink>
+          <NuxtLink to="/booking/seats" class="hover:text-[#EAB308] transition">SEATS</NuxtLink> 
           <NuxtLink v-if="userRole === 'admin'" to="/admin" class="text-[#EAB308] border border-[#EAB308]/30 px-3 py-1 rounded">ADMIN</NuxtLink>
         </div>
 
