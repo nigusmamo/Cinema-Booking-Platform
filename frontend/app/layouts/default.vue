@@ -24,9 +24,9 @@
               {{ userName.charAt(0) }}
             </div>
           </template>
-          <NuxtLink :to="isAuthenticated ? '/schedules' : '/auth/login'" 
+          <NuxtLink :to="isAuthenticated ? '/schedules' : '/auth/signup'" 
             class="bg-[#EAB308] text-black px-6 py-2.5 rounded-lg font-black text-sm hover:scale-105 transition shadow-[0_0_20px_rgba(234,179,8,0.2)]">
-            {{ isAuthenticated ? 'MY TICKETS' : 'BOOK NOW' }}
+            {{ isAuthenticated ? 'MY TICKETS' : 'Sign Up' }}
           </NuxtLink> 
         </div>
       </div>
@@ -46,6 +46,6 @@ const userRole = ref('user')
 
 const handleLogout = () => {
   authCookie.value = null
-  navigateTo('/auth/login')
+  navigateTo('/')
 }
 </script>

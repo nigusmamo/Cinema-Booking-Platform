@@ -9,3 +9,20 @@ array_relationships:
         table:
           name: movie_stars
           schema: public
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - image_url
+        - name
+        - id
+      filter: {}
+    comment: ""
+  - role: user
+    permission:
+      columns:
+        - image_url
+        - name
+        - id
+      filter: {}
+    comment: ""

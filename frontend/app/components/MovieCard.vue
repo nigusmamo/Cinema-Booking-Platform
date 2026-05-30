@@ -1,7 +1,7 @@
 <template>
   <div class="group relative bg-bg-card rounded-xl overflow-hidden border border-gray-800 hover:border-primary/50 transition duration-500">
     <div class="aspect-[6/7] overflow-hidden">
-      <img :src="image" :alt="title" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+      <img :src="image" referrerpolicy="no-referrer" :alt="title" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
     </div>
     
     <div class="p-4 bg-gradient-to-t from-black to-transparent">

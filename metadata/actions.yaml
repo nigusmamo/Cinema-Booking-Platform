@@ -3,14 +3,20 @@ actions:
     definition:
       kind: synchronous
       handler: http://host.docker.internal:8000/auth/login
+    permissions:
+      - role: anonymous
+    comment: login
   - name: signup
     definition:
       kind: synchronous
       handler: http://host.docker.internal:8000/auth/signup
+    permissions:
+      - role: anonymous
+    comment: signup
 custom_types:
   enums: []
   input_objects: []
   objects:
-    - name: SignupOutput
     - name: LoginOutput
+    - name: SignupOutput
   scalars: []

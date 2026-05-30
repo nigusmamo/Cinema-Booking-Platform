@@ -21,5 +21,8 @@ func main() {
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "Server is running"}) 
 	})
-	r.Run(":8000")
+
+	port := utils.GetEnv("PORT", "8000")
+	log.Printf("Server starting on port %s", port)
+	r.Run(":" + port)
 }

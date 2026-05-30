@@ -1,10 +1,6 @@
 table:
   name: seats
   schema: public
-object_relationships:
-  - name: hall
-    using:
-      foreign_key_constraint_on: hall_id
 array_relationships:
   - name: booking_seats
     using:
@@ -13,3 +9,23 @@ array_relationships:
         table:
           name: booking_seats
           schema: public
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - column_number
+        - row_label
+        - type
+        - id
+      filter: {}
+      allow_aggregations: true
+    comment: ""
+  - role: user
+    permission:
+      columns:
+        - column_number
+        - row_label
+        - type
+        - id
+      filter: {}
+    comment: ""

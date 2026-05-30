@@ -69,15 +69,26 @@
 </template>
 
 <script setup lang="ts">
-import { GET_MOVIE_DETAILS } from '~/graphql/movies'
+import { GET_SCHEDULE_SEATS, GET_BOOKED_SEATS } from '~/graphql/movies'
 
 const route = useRoute()
-const movieId = route.query.id 
-
+const scheduleId = route.query.schedule_id 
 const { saveBooking } = useBookingStore()
+const authCookie = useCookie('auth_token')
 
-const { data: movieData } = await useAsyncQuery<any>(GET_MOVIE_DETAILS, { id: movieId })
-const movie = computed(() => movieData.value?.movies_by_pk)
+const { data: scheduleData, pending } = await useAsyncQuery<any>(GET_SCHEDULE_SEATS, { 
+  schedule_id: scheduleId 
+})
+
+const { data: bookedData } = await useAsyncQuery<any>(GET_BOOKED_SEATS, { 
+  schedule_id: scheduleId 
+})
+
+const movie = computed(() => scheduleData.value?.schedules_by_pk?.movie)
+
+const alreadyBookedList = computed(() => {
+  return bookedData.value?.booking_seats.map((s: any) => s.seat_id) || []
+})
 
 const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 const selectedSeats = ref<string[]>([])
@@ -94,40 +105,29 @@ const toggleSeat = (row: string, col: number) => {
   }
 }
 
-const totalPrice = computed(() => {
-  return selectedSeats.value.reduce((total, id) => total + getPrice(id.charAt(0)), 0)
-})
+const isSeatBooked = (row: string, col: number) => {
+  const seatLabel = `${row}${col}`
+  return alreadyBookedList.value.includes(seatLabel)
+}
+
+const totalPrice = computed(() => selectedSeats.value.reduce((total, id) => total + getPrice(id.charAt(0)), 0))
 
 const handleBooking = async () => {
-  console.log("Confirm button clicked!")
-  
-  if (selectedSeats.value.length === 0) {
-    alert("Please select at least one seat!")
-    return
-  }
+  if (!authCookie.value) return navigateTo('/auth/signup')
+  if (selectedSeats.value.length === 0) return alert("Please select a seat!")
 
-  if (!movie.value) {
-    console.error("Movie data not found in component!")
-    alert("Error: Movie information is missing. Please refresh the page.")
-    return
-  }
-
-  try {
+  if (movie.value) {
     const cleanMovieData = {
       title: movie.value.title,
       main_image: movie.value.main_image,
-      id: movie.value.id
+      id: movie.value.id,
+      schedule_id: scheduleId
     }
-    
-    console.log("Saving booking data...", cleanMovieData)
+    console.log("Saving data...", cleanMovieData)
     saveBooking(cleanMovieData, selectedSeats.value, totalPrice.value)
-    
-    console.log("Redirecting to summary...")
     await navigateTo('/booking/summary')
-  } catch (err) {
-    console.error("Navigation error:", err)
+  } else {
+    alert("Loading movie data... Please wait a second and try again.")
   }
 }
-
-const isSeatBooked = (row: string, col: number) => (row === 'E' && col === 7) || (row === 'H' && col === 12)
 </script>

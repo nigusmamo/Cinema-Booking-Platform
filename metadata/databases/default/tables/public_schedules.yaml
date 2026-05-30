@@ -2,9 +2,6 @@ table:
   name: schedules
   schema: public
 object_relationships:
-  - name: hall
-    using:
-      foreign_key_constraint_on: hall_id
   - name: movie
     using:
       foreign_key_constraint_on: movie_id
@@ -16,3 +13,24 @@ array_relationships:
         table:
           name: bookings
           schema: public
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - price
+        - end_time
+        - start_time
+        - id
+        - movie_id
+      filter: {}
+    comment: ""
+  - role: user
+    permission:
+      columns:
+        - price
+        - end_time
+        - start_time
+        - id
+        - movie_id
+      filter: {}
+    comment: ""
