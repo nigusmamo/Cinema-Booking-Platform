@@ -16,3 +16,30 @@ array_relationships:
         table:
           name: booking_seats
           schema: public
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - total_price
+        - booking_reference
+        - payment_method
+        - payment_status
+        - created_at
+        - id
+        - schedule_id
+        - user_id
+      filter: {}
+    comment: ""
+  - role: user
+    permission:
+      columns:
+        - total_price
+        - booking_reference
+        - payment_method
+        - payment_status
+        - created_at
+        - id
+        - schedule_id
+        - user_id
+      filter: {}
+    comment: ""

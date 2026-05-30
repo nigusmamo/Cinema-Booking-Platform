@@ -3,7 +3,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-05-14',
 
   future: {
-    compatibilityVersion: 4, 
+    compatibilityVersion: 4,
   },
 
   modules: [

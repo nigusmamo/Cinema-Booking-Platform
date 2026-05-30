@@ -29,20 +29,6 @@
             <p class="text-gray-500 text-sm leading-relaxed max-w-xl mb-8 line-clamp-2 italic font-medium">
               {{ movie.description }}
             </p>
-            
-            <div class="flex items-center gap-4 text-xs font-bold text-gray-400 mb-6">
-               <span>🕒 {{ movie.duration_minutes }}m</span>
-            </div>
-
-            <div class="flex flex-wrap gap-3">
-              <button 
-                v-for="time in ['10:30', '13:15', '16:00', '18:45', '21:30']" :key="time"
-                @click="movieSelections[movie.id] = time"
-                class="px-5 py-2 rounded-full border text-xs font-black transition-all duration-300"
-                :class="movieSelections[movie.id] === time ? 'bg-[#EAB308] border-[#EAB308] text-black shadow-lg shadow-[#EAB308]/20' : 'border-white/10 text-gray-400 hover:border-gray-600'">
-                {{ time }}
-              </button>
-            </div>
           </div>
 
           <div class="flex flex-col justify-center py-10 items-end">
