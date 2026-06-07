@@ -12,6 +12,7 @@
   "dependencies": {
     "@nuxtjs/apollo": "^5.0.0-alpha.16",
     "@vee-validate/rules": "^4.15.1",
+    "@vue/apollo-composable": "^4.2.2",
     "graphql": "^16.14.0",
     "nuxt": "^4.4.5",
     "vee-validate": "^4.15.1",

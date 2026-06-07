@@ -16,6 +16,22 @@ array_relationships:
         table:
           name: booking_seats
           schema: public
+insert_permissions:
+  - role: user
+    permission:
+      check: {}
+      set:
+        user_id: x-hasura-User-Id
+      columns:
+        - total_price
+        - booking_reference
+        - payment_method
+        - payment_status
+        - created_at
+        - id
+        - schedule_id
+        - user_id
+    comment: ""
 select_permissions:
   - role: anonymous
     permission:
