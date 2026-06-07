@@ -6,6 +6,15 @@ type Mutation {
 }
 
 type Mutation {
+  pay(
+    amount: String!
+    email: String!
+    first_name: String!
+    last_name: String!
+  ): PaymentOutput
+}
+
+type Mutation {
   signup(
     full_name: String!
     email: String!
@@ -23,5 +32,10 @@ type SignupOutput {
   id: String!
   full_name: String!
   email: String!
+}
+
+type PaymentOutput {
+  checkout_url: String!
+  tx_ref: String!
 }
 

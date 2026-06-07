@@ -6,6 +6,13 @@ actions:
     permissions:
       - role: anonymous
     comment: login
+  - name: pay
+    definition:
+      kind: synchronous
+      handler: http://host.docker.internal:8000/payment/initialize
+    permissions:
+      - role: user
+    comment: pay
   - name: signup
     definition:
       kind: synchronous
@@ -19,4 +26,5 @@ custom_types:
   objects:
     - name: LoginOutput
     - name: SignupOutput
+    - name: PaymentOutput
   scalars: []

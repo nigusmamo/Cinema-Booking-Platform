@@ -17,6 +17,7 @@ func main() {
 	utils.ConnectDB()
 	r := gin.Default()
 	routes.AuthRoutes(r)
+	routes.PaymentRoutes(r)
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "Server is running"}) 

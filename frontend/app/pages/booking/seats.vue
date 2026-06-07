@@ -59,8 +59,7 @@
         <button 
           @click="handleBooking"
           :disabled="selectedSeats.length === 0"
-          class="w-full md:w-auto bg-[#EAB308] text-black px-16 py-5 rounded-2xl font-black text-sm hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-[#EAB308]/20 disabled:opacity-20"
-        >
+          class="w-full md:w-auto bg-[#EAB308] text-black px-16 py-5 rounded-2xl font-black text-sm hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-[#EAB308]/20 disabled:opacity-20">
           CONFIRM BOOKING
         </button>
       </div>
@@ -113,21 +112,28 @@ const isSeatBooked = (row: string, col: number) => {
 const totalPrice = computed(() => selectedSeats.value.reduce((total, id) => total + getPrice(id.charAt(0)), 0))
 
 const handleBooking = async () => {
-  if (!authCookie.value) return navigateTo('/auth/signup')
-  if (selectedSeats.value.length === 0) return alert("Please select a seat!")
+  const authCookie = useCookie('auth_token');
+
+  if (!authCookie.value) {
+    return navigateTo('/auth/signup');
+  }
+
+  if (selectedSeats.value.length === 0) {
+    alert("Please select at least one seat!");
+    return;
+  }
 
   if (movie.value) {
     const cleanMovieData = {
       title: movie.value.title,
       main_image: movie.value.main_image,
       id: movie.value.id,
-      schedule_id: scheduleId
-    }
-    console.log("Saving data...", cleanMovieData)
-    saveBooking(cleanMovieData, selectedSeats.value, totalPrice.value)
-    await navigateTo('/booking/summary')
-  } else {
-    alert("Loading movie data... Please wait a second and try again.")
+      schedule_id: scheduleId 
+    };
+    
+    console.log("Saving data to storage:", cleanMovieData);
+    saveBooking(cleanMovieData, selectedSeats.value, totalPrice.value);
+    await navigateTo('/booking/summary');
   }
 }
 </script>

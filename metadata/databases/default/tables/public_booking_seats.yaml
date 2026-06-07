@@ -5,9 +5,15 @@ object_relationships:
   - name: booking
     using:
       foreign_key_constraint_on: booking_id
-  - name: seat
-    using:
-      foreign_key_constraint_on: seat_id
+insert_permissions:
+  - role: user
+    permission:
+      check: {}
+      columns:
+        - booking_id
+        - id
+        - seat_id
+    comment: ""
 select_permissions:
   - role: anonymous
     permission:

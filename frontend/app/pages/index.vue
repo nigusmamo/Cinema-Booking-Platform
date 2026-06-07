@@ -15,7 +15,7 @@
       <div class="relative z-10 max-w-2xl">
         <h1 class="text-7xl md:text-8xl font-black mb-6 leading-[0.85] tracking-tighter text-white uppercase">
           Experience <br/> 
-          <span class="text-gray-500">Cinema Beyond</span> <br/> 
+          <span class="text-gray-500 whitespace-nowrap">Cinema Beyond</span> <br/>
           <span class="text-[#EAB308]">Reality</span>
         </h1>
         <p class="text-gray-400 text-lg mb-10 max-w-md font-medium">

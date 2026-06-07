@@ -8,8 +8,8 @@ export const GET_HOME_PAGE_DATA = gql`
       main_image
       duration_minutes
       rating_avg
-      movie_directors { director { name } }
-      movie_genres { genre { name } }
+      movie_directors { director { id name } }
+      movie_genres { genre { id name } }
       schedules {
         start_time
       }
@@ -91,6 +91,34 @@ export const GET_BOOKED_SEATS = gql`
       } 
     }) {
       seat_id
+    }
+  }
+`;
+
+
+export const INITIATE_PAYMENT = gql`
+  mutation InitiatePayment($amount: String!, $email: String!, $first_name: String!, $last_name: String!) {
+    pay(amount: $amount, email: $email, first_name: $first_name, last_name: $last_name) {
+      checkout_url
+      tx_ref
+    }
+  }
+`;
+
+export const CREATE_BOOKING = gql`
+  mutation CreateBooking($object: bookings_insert_input!) {
+    insert_bookings_one(object: $object) {
+      id
+      booking_reference
+    }
+  }
+`;
+
+export const GET_ME = gql`
+  query GetMe {
+    users {
+      full_name
+      email
     }
   }
 `;

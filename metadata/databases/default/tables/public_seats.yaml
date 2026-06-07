@@ -1,14 +1,6 @@
 table:
   name: seats
   schema: public
-array_relationships:
-  - name: booking_seats
-    using:
-      foreign_key_constraint_on:
-        column: seat_id
-        table:
-          name: booking_seats
-          schema: public
 select_permissions:
   - role: anonymous
     permission:

@@ -68,9 +68,11 @@ const handleLogin = async () => {
     })
 
     if (result?.data?.login) {
-      const { token } = result.data.login
+      const { token, id } = result.data.login
       const authCookie = useCookie('auth_token', { maxAge: 60 * 60 * 24 * 7, path: '/' })
       authCookie.value = token
+      const userIdCookie = useCookie('user_id', { maxAge: 60 * 60 * 24 * 7, path: '/' })
+      userIdCookie.value = id
       await navigateTo('/')
     }
   } catch (err: any) {

@@ -17,7 +17,6 @@
               <div class="flex flex-wrap items-center gap-6 text-gray-400 text-sm font-medium">
                 <span class="text-[#EAB308] flex items-center gap-1 font-bold">★ {{ movie.rating_avg }}</span>
                 <span>🕒 {{ movie.duration_minutes }} min</span>
-                <span class="border border-gray-700 px-2 py-0.5 rounded text-[10px] tracking-widest font-black text-gray-300 uppercase">Premium</span>
                 <span>📅 {{ new Date(movie.release_date).getFullYear() }}</span>
                 <div class="flex gap-2">
                   <span v-for="g in movie.movie_genres" :key="g.genre.name" class="bg-white/5 px-3 py-1 rounded-full text-[11px] text-gray-300 border border-white/5 uppercase">
