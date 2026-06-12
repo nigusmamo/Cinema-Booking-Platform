@@ -13,11 +13,6 @@
       <form @submit.prevent="handleLogin">
         <BaseInput v-model="email" label="Email" type="email" placeholder="Enter your email address" />
         <BaseInput v-model="password" label="Password" type="password" placeholder="Enter your password" />
-        
-        <div class="flex justify-end mb-6">
-          <a href="#" class="text-xs text-primary hover:underline">Forgot Password?</a>
-        </div>
-
         <BaseButton :loading="isLoggingIn">Login</BaseButton>
       </form>
 
