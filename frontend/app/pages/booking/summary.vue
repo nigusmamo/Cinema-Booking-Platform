@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-[#0D0D0D] text-white py-20 px-4 font-sans text-left">
     <div class="max-w-5xl mx-auto">
-      <h1 class="text-3xl font-black uppercase italic mb-10 tracking-tighter">
+      <h1 class="text-3xl font-luxury uppercase italic mb-10 tracking-tighter">
         Booking Summary <span class="text-[#EAB308]">.</span>
       </h1>
 
@@ -10,7 +10,7 @@
           <div class="bg-[#121212] border border-white/5 p-8 rounded-[40px] flex gap-8 shadow-2xl items-center">
             <img :src="movieInfo?.main_image" class="w-32 h-44 rounded-3xl object-cover border-2 border-white/5 shadow-2xl" referrerpolicy="no-referrer" />
             <div class="flex-1">
-              <h2 class="text-3xl font-black text-[#EAB308] uppercase mb-2">{{ movieInfo?.title }}</h2>
+              <h2 class="text-3xl font-luxury text-[#EAB308] uppercase mb-2">{{ movieInfo?.title }}</h2>
               <div class="space-y-3">
                 <p class="text-xs text-gray-400 font-black uppercase tracking-widest">Confirmed Seats</p>
                 <div class="flex flex-wrap gap-2">
@@ -58,47 +58,34 @@
 </template>
 
 <script setup lang="ts">
-import { INITIATE_PAYMENT, GET_ME } from '~/graphql/movies'
+import { INITIATE_PAYMENT } from '~/graphql/movies'
 
 const { selectedMovie, selectedSeats, totalPrice, loadBooking } = useBookingStore()
 const isProcessing = ref(false)
 const movieInfo = computed(() => selectedMovie.value as any)
 
+const { user, fetchUser } = useAuth()
 const { resolveClient } = useApolloClient()
 const authCookie = useCookie('auth_token')
-const currentUser = ref<any>(null)
 
 onMounted(async () => {
   loadBooking() 
-  
-  try {
-    const client = resolveClient()
-    const { data } = await client.query({
-      query: GET_ME,
-      context: {
-        headers: { Authorization: `Bearer ${authCookie.value}` }
-      }
-    })
-    if (data?.users?.length > 0) {
-      currentUser.value = data.users[0]
-    }
-  } catch (err) {
-    console.error("User data fetch error:", err)
-  }
+
+  await fetchUser()
 })
 
 const payWithChapa = async () => {
-  if (!totalPrice.value || isProcessing.value || !currentUser.value) {
+  if (!totalPrice.value || isProcessing.value || !user.value) {
     alert("Please wait until user data is loaded.")
     return
   }
 
   isProcessing.value = true
-  
+
   try {
     const client = resolveClient()
-    
-    const nameParts = currentUser.value.full_name.split(' ')
+
+    const nameParts = user.value.full_name.split(' ')
     const fName = nameParts[0] || 'Customer'
     const lName = nameParts.slice(1).join(' ') || 'User'
 
@@ -106,7 +93,7 @@ const payWithChapa = async () => {
       mutation: INITIATE_PAYMENT,
       variables: {
         amount: totalPrice.value.toString(),
-        email: currentUser.value.email, 
+        email: user.value.email, 
         first_name: fName,             
         last_name: lName
       },

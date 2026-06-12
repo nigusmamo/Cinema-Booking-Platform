@@ -34,20 +34,11 @@
 <script setup lang="ts">
 import { LOGIN_MUTATION } from '~/graphql/auth'
 
-interface LoginResponse {
-  login: {
-    token: string
-    id: string
-    full_name: string
-  }
-}
-
 const email = ref('')
 const password = ref('')
 const isLoggingIn = ref(false)
 const errorMessage = ref('')
-
-
+const { fetchUser, isAdmin, onLogin } = useAuth()
 
 const handleLogin = async () => {
   if (!email.value || !password.value) {
@@ -59,7 +50,13 @@ const handleLogin = async () => {
   errorMessage.value = ""
 
   try {
-    const result = await useNuxtApp().$apollo.defaultClient.mutate({
+    const { $apollo } = useNuxtApp()
+    const { onLogout, user } = useAuth()
+    
+    await onLogout()
+    user.value = null
+    
+    const result = await $apollo.defaultClient.mutate({
       mutation: LOGIN_MUTATION,
       variables: {
         email: email.value,
@@ -69,11 +66,19 @@ const handleLogin = async () => {
 
     if (result?.data?.login) {
       const { token, id } = result.data.login
-      const authCookie = useCookie('auth_token', { maxAge: 60 * 60 * 24 * 7, path: '/' })
-      authCookie.value = token
+      
+      await onLogin(token)
+      
       const userIdCookie = useCookie('user_id', { maxAge: 60 * 60 * 24 * 7, path: '/' })
       userIdCookie.value = id
-      await navigateTo('/')
+      
+      await fetchUser(token)
+      
+      if (isAdmin.value) {
+        await navigateTo('/admin/movies')
+      } else {
+        await navigateTo('/')
+      }
     }
   } catch (err: any) {
     console.error("Login Error:", err)

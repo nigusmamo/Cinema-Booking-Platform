@@ -31,13 +31,12 @@ export const GET_MOVIE_DETAILS = gql`
       release_date
       status
       movie_images { id image_url }
-      movie_directors { director { name } }
-      movie_stars { star { name } }
+      movie_directors { director { name image_url } }
+      movie_stars { star { name image_url } }
       movie_genres { genre { name } }
       schedules {
         id
         start_time
-        price
       }
     }
   }
@@ -117,6 +116,7 @@ export const CREATE_BOOKING = gql`
 export const GET_ME = gql`
   query GetMe {
     users {
+      id
       full_name
       email
     }

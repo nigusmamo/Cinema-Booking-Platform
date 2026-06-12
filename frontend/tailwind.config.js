@@ -9,6 +9,10 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        'luxury': ['"Playfair Display"', 'serif'],
+        'modern-luxury': ['"Cormorant Garamond"', 'serif'],
+      },
       colors: {
         'primary': '#EAB308',     
         'bg-main': '#0D0D0D',    

@@ -5,7 +5,7 @@
       <div class="flex items-center gap-6">
         <img :src="movie.main_image" class="w-16 h-20 rounded-xl object-cover border border-white/10 shadow-2xl" />
         <div>
-          <h1 class="text-2xl font-black uppercase tracking-tight italic">{{ movie.title }}</h1>
+          <h1 class="text-2xl font-luxury uppercase tracking-tight italic">{{ movie.title }}</h1>
           <p class="text-gray-500 text-xs mt-1 font-bold tracking-widest uppercase">{{ movie.duration_minutes }} MINUTES • NOW SHOWING</p>
         </div>
       </div>
