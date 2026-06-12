@@ -1,5 +1,6 @@
 <template>
   <div class="bg-[#0D0D0D] min-h-screen font-sans text-white">
+
     <section class="relative h-[85vh] flex items-center px-6 md:px-20 overflow-hidden">
       
       <img 
@@ -13,7 +14,7 @@
       <div class="absolute inset-0 bg-gradient-to-t from-[#0D0D0D] via-transparent to-transparent"></div>
       
       <div class="relative z-10 max-w-2xl">
-        <h1 class="text-7xl md:text-8xl font-black mb-6 leading-[0.85] tracking-tighter text-white uppercase">
+        <h1 class="text-7xl md:text-8xl font-modern-luxury font-medium mb-6 leading-[0.85] tracking-tighter text-white uppercase">
           Experience <br/> 
           <span class="text-gray-500 whitespace-nowrap">Cinema Beyond</span> <br/>
           <span class="text-[#EAB308]">Reality</span>
@@ -23,7 +24,7 @@
         </p>
 
         <button 
-          v-if="allMovies.length > 0"
+          v-if="allMovies.length > 0 && !isAdmin"
           @click="navigateTo(`/schedules`)" 
           class="bg-[#EAB308] text-black px-12 py-4 rounded-xl font-black hover:scale-105 transition-all shadow-[0_0_30px_rgba(234,179,8,0.3)]">
           BOOK TICKETS
@@ -83,7 +84,7 @@
     </div>
 
     <div class="max-w-7xl mx-auto px-6 py-24">
-      <h2 class="text-3xl font-black uppercase italic mb-16 tracking-tighter">NOW SHOWING <span class="text-[#EAB308]">.</span></h2>
+      <h2 class="text-3xl font-luxury uppercase italic mb-16 tracking-tighter">NOW SHOWING <span class="text-[#EAB308]">.</span></h2>
       
       <div v-if="pending" class="grid grid-cols-2 md:grid-cols-4 gap-12">
         <div v-for="i in 4" :key="i" class="aspect-[4/5] bg-white/5 animate-pulse rounded-[32px]"></div>
@@ -112,6 +113,13 @@
 import { GET_HOME_PAGE_DATA } from '~/graphql/movies'
 
 const { data, pending } = await useAsyncQuery<any>(GET_HOME_PAGE_DATA)
+const { isAdmin } = useAuth()
+
+onMounted(() => {
+  if (isAdmin.value) {
+    navigateTo('/admin/movies')
+  }
+})
 
 const dynamicDays = computed(() => {
   const daysArray = []
@@ -134,7 +142,6 @@ const selectedDate = ref(new Date().toISOString().split('T')[0])
 
 const selectedGenre = ref('')
 const selectedDirector = ref('')
-const selectedTech = ref('2D')
 const searchQuery = ref('')
 
 const allMovies = computed(() => data.value?.movies ?? [])

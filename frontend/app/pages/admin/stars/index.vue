@@ -1,0 +1,267 @@
+<template>
+  <div class="max-w-7xl mx-auto">
+    
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-10">
+      <div>
+        <h1 class="text-4xl font-luxury uppercase italic tracking-tighter mb-2">Manage <span class="text-[#EAB308]">Stars .</span></h1>
+        <p class="text-gray-500 text-sm font-bold uppercase tracking-widest">Total: {{ stars.length }} Stars</p>
+      </div>
+
+      <button @click="openModal()" class="bg-[#EAB308] text-black px-8 py-3 rounded-xl font-black text-xs hover:scale-105 transition shadow-lg text-center flex items-center justify-center">
+        + ADD STAR
+      </button>
+    </div>
+
+    <div v-if="pending" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+      <div v-for="i in 10" :key="i" class="bg-[#0D0D0D] border border-white/5 rounded-[35px] h-48 animate-pulse"></div>
+    </div>
+
+    <div v-else-if="stars.length === 0" class="text-center py-20 bg-[#0D0D0D] border border-white/5 rounded-[35px]">
+      <p class="text-gray-500 font-bold uppercase tracking-widest">No stars found.</p>
+    </div>
+
+    <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 pb-20">
+      <div v-for="star in stars" :key="star.id" class="group bg-[#0A0A0A] border border-white/5 rounded-[40px] p-6 flex flex-col items-center hover:border-[#EAB308]/50 transition-all duration-500 shadow-2xl hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+        
+        <div class="w-32 h-32 rounded-full overflow-hidden mb-6 bg-gray-900 border-4 border-white/5 group-hover:border-[#EAB308] transition duration-500 shadow-inner">
+          <img v-if="star.image_url" :src="star.image_url" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+          <div v-else class="w-full h-full flex items-center justify-center text-gray-700 bg-gray-900">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          </div>
+        </div>
+        
+        <h3 class="font-luxury text-lg text-white uppercase tracking-tight mb-6 text-center line-clamp-1 group-hover:text-[#EAB308] transition duration-500">{{ star.name }}</h3>
+        
+        <div class="flex gap-3 w-full mt-auto pt-4 border-t border-white/5">
+          <button @click="openModal(star)" class="flex-1 bg-white/5 hover:bg-white/10 text-white p-3 rounded-2xl transition flex items-center justify-center">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          </button>
+          <button @click="confirmDelete(star.id)" class="flex-1 bg-red-500/10 hover:bg-red-500/20 text-red-500 p-3 rounded-2xl transition flex items-center justify-center">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal for Create/Edit -->
+  <AdminModal v-if="showModal" :title="editId ? 'Edit Star' : 'Add Star'" @close="closeModal" max-width="max-w-md">
+    <form @submit.prevent="handleSubmit" class="space-y-6">
+      
+      <div v-if="errorMessage" class="bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-xl text-sm font-bold">
+        {{ errorMessage }}
+      </div>
+
+      <div>
+        <label class="block text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2">Star Name</label>
+        <input v-model="form.name" type="text" required class="w-full bg-black border border-white/10 px-4 py-4 rounded-2xl focus:outline-none focus:border-[#EAB308] text-white transition" placeholder="e.g. Leonardo DiCaprio">
+      </div>
+
+      <div>
+        <label class="block text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2">Photo</label>
+        <div 
+          @click="imageInput?.click()" 
+          @dragover.prevent @drop.prevent="handleDrop"
+          class="w-full h-40 border-2 border-dashed border-white/10 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:border-[#EAB308] transition overflow-hidden relative group bg-black"
+        >
+          <input type="file" ref="imageInput" class="hidden" accept="image/jpeg, image/png" @change="handleFileSelect">
+          
+          <div v-if="imagePreview" class="absolute inset-0">
+            <img :src="imagePreview" class="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition" />
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+              <span class="bg-black/80 px-4 py-2 rounded-xl text-xs font-bold">Change Image</span>
+            </div>
+          </div>
+          
+          <div v-else class="text-center">
+            <div class="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-2 group-hover:bg-[#EAB308]/10 group-hover:text-[#EAB308] transition">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            </div>
+            <p class="text-xs font-bold">Upload Photo</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-4 flex justify-end">
+        <button type="submit" class="bg-[#EAB308] text-black px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition shadow-xl w-full flex items-center justify-center" :disabled="isSubmitting">
+          <span v-if="isSubmitting" class="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>
+          <span v-else>{{ editId ? 'Update' : 'Save' }} Star</span>
+        </button>
+      </div>
+    </form>
+  </AdminModal>
+
+  <!-- Delete Confirmation Modal -->
+  <AdminDeleteConfirm 
+    v-if="showDeleteConfirm" 
+    :is-deleting="isDeleting"
+    title="Delete Star"
+    message="Are you sure you want to delete this star? This might fail if the star is currently attached to any movies."
+    @confirm="executeDelete"
+    @cancel="showDeleteConfirm = false"
+  />
+</template>
+
+<script setup lang="ts">
+definePageMeta({ layout: 'admin' })
+import { 
+  GET_ADMIN_FORM_DATA, 
+  INSERT_STAR, 
+  UPDATE_STAR, 
+  DELETE_STAR,
+  UPLOAD_FILE
+} from '~/graphql/admin'
+import { useQuery, useApolloClient } from '@vue/apollo-composable'
+
+const { result, loading: pending, refetch } = useQuery(GET_ADMIN_FORM_DATA)
+const { resolveClient } = useApolloClient()
+const authCookie = useCookie('auth_token')
+
+const stars = computed(() => result.value?.stars || [])
+
+// Modal Logic
+const showModal = ref(false)
+const editId = ref<string | null>(null)
+const isSubmitting = ref(false)
+const errorMessage = ref('')
+const imageInput = ref<HTMLInputElement | null>(null)
+
+const form = reactive({
+  name: ''
+})
+
+const imageFile = ref<File | null>(null)
+const imagePreview = ref<string | null>(null)
+const existingImageUrl = ref<string | null>(null)
+
+const openModal = (star?: any) => {
+  errorMessage.value = ''
+  imageFile.value = null
+  if (star) {
+    editId.value = star.id
+    form.name = star.name
+    imagePreview.value = star.image_url
+    existingImageUrl.value = star.image_url
+  } else {
+    editId.value = null
+    form.name = ''
+    imagePreview.value = null
+    existingImageUrl.value = null
+  }
+  showModal.value = true
+}
+
+const closeModal = () => {
+  showModal.value = false
+}
+
+// File Handling
+const processFile = (file: File) => {
+  if (!file.type.startsWith('image/')) {
+    errorMessage.value = "Only image files are allowed."
+    return
+  }
+  imageFile.value = file
+  const reader = new FileReader()
+  reader.onload = (e) => { imagePreview.value = e.target?.result as string }
+  reader.readAsDataURL(file)
+}
+
+const handleDrop = (e: DragEvent) => {
+  const file = e.dataTransfer?.files[0]
+  if (file) processFile(file)
+}
+
+const handleFileSelect = (e: Event) => {
+  const file = (e.target as HTMLInputElement).files?.[0]
+  if (file) processFile(file)
+}
+
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = error => reject(error)
+  })
+}
+
+const handleSubmit = async () => {
+  errorMessage.value = ''
+  isSubmitting.value = true
+  
+  try {
+    const client = resolveClient()
+    const headers = { Authorization: `Bearer ${authCookie.value}` }
+
+    let imageUrl = existingImageUrl.value
+
+    if (imageFile.value) {
+      const base64Data = await fileToBase64(imageFile.value)
+      const uploadRes = await client.mutate({
+        mutation: UPLOAD_FILE,
+        variables: { base64_data: base64Data, filename: imageFile.value.name },
+        context: { headers }
+      })
+      imageUrl = uploadRes.data?.upload_file?.url
+      if (!imageUrl) throw new Error("Image upload failed.")
+    }
+
+    if (editId.value) {
+      await client.mutate({
+        mutation: UPDATE_STAR,
+        variables: { id: editId.value, name: form.name, image_url: imageUrl },
+        context: { headers }
+      })
+    } else {
+      await client.mutate({
+        mutation: INSERT_STAR,
+        variables: { name: form.name, image_url: imageUrl },
+        context: { headers }
+      })
+    }
+
+    await refetch()
+    closeModal()
+  } catch (err: any) {
+    console.error(err)
+    errorMessage.value = err.message || "An error occurred."
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+// Delete Logic
+const showDeleteConfirm = ref(false)
+const isDeleting = ref(false)
+const starToDelete = ref<string | null>(null)
+
+const confirmDelete = (id: string) => {
+  starToDelete.value = id
+  showDeleteConfirm.value = true
+}
+
+const executeDelete = async () => {
+  if (!starToDelete.value) return
+  isDeleting.value = true
+  
+  try {
+    const client = resolveClient()
+    await client.mutate({
+      mutation: DELETE_STAR,
+      variables: { id: starToDelete.value },
+      context: { headers: { Authorization: `Bearer ${authCookie.value}` } }
+    })
+    await refetch()
+    showDeleteConfirm.value = false
+  } catch (err: any) {
+    console.error("Failed to delete:", err)
+    alert("Failed to delete star. They might be linked to a movie.")
+  } finally {
+    isDeleting.value = false
+    starToDelete.value = null
+  }
+}
+</script>

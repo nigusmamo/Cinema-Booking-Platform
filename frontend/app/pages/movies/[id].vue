@@ -33,20 +33,32 @@
         <div class="lg:col-span-2 space-y-12 text-left">
           <p class="text-gray-400 leading-relaxed text-xl font-medium italic">{{ movie.description }}</p>
           
-          <div class="grid grid-cols-2 gap-10">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
             <div>
               <h3 class="text-gray-500 text-[11px] font-black uppercase tracking-[0.2em] mb-4">Director</h3>
-              <p v-for="d in movie.movie_directors" :key="d.director.name" class="text-white font-black text-2xl italic tracking-tighter">
-                {{ d.director.name }}
-              </p>
+              <div class="flex flex-wrap gap-3">
+                <div v-for="d in movie.movie_directors" :key="d.director.name" class="flex flex-col items-center gap-2">
+                  <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-white/5 shadow-xl bg-gray-900">
+                    <img :src="d.director.image_url || 'https://ui-avatars.com/api/?name=' + d.director.name + '&background=EAB308&color=000'" class="w-full h-full object-cover" referrerpolicy="no-referrer" />
+                  </div>
+                  <p class="text-white font-bold text-[8px] uppercase tracking-wider text-center max-w-[60px] line-clamp-1">
+                    {{ d.director.name }}
+                  </p>
+                </div>
+              </div>
             </div>
             <div>
               <h3 class="text-gray-500 text-[11px] font-black uppercase tracking-[0.2em] mb-4">Stars</h3>
-              <p class="text-white font-bold text-base">
-                <span v-for="(s, index) in movie.movie_stars" :key="index">
-                  {{ s.star.name }}{{ Number(index) < movie.movie_stars.length - 1 ? ', ' : '' }}
-                </span>
-              </p>
+              <div class="flex flex-wrap gap-3">
+                <div v-for="s in movie.movie_stars" :key="s.star.name" class="flex flex-col items-center gap-2">
+                  <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-white/5 shadow-xl bg-gray-900">
+                    <img :src="s.star.image_url || 'https://ui-avatars.com/api/?name=' + s.star.name + '&background=EAB308&color=000'" class="w-full h-full object-cover" referrerpolicy="no-referrer" />
+                  </div>
+                  <p class="text-white font-bold text-[8px] uppercase tracking-wider text-center max-w-[60px] line-clamp-1">
+                    {{ s.star.name }}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -62,7 +74,7 @@
 
         <div class="relative">
           <div class="bg-[#121212] border border-white/5 p-8 rounded-[40px] shadow-2xl sticky top-28">
-             <h3 class="text-white font-black uppercase mb-8 tracking-tighter text-xl text-center">AVAILABLE <span class="text-[#EAB308]">SHOWS</span></h3>
+             <h3 class="text-white font-luxury uppercase mb-8 tracking-tighter text-xl text-center">AVAILABLE <span class="text-[#EAB308]">SHOWS</span></h3>
              <div class="flex gap-3 overflow-x-auto no-scrollbar py-4 px-2 -mx-2">
                 <div v-for="day in availableDates" :key="day.fullDate" 
                     @click="selectedDate = day.fullDate"

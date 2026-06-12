@@ -22,6 +22,13 @@ type Mutation {
   ): SignupOutput
 }
 
+type Mutation {
+  upload_file(
+    base64_data: String!
+    filename: String!
+  ): FileUploadOutput
+}
+
 type LoginOutput {
   token: String!
   id: String!
@@ -37,5 +44,9 @@ type SignupOutput {
 type PaymentOutput {
   checkout_url: String!
   tx_ref: String!
+}
+
+type FileUploadOutput {
+  url: String!
 }
 

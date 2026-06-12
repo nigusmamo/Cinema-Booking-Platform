@@ -62,12 +62,18 @@ const handleSignup = async () => {
   errorMessage.value = ""
 
   try {
-    const result = await useNuxtApp().$apollo.defaultClient.mutate({
+    const { $apollo } = useNuxtApp()
+    const result = await $apollo.defaultClient.mutate({
       mutation: SIGNUP_MUTATION,
       variables: {
         full_name: fullName.value,
         email: email.value,
         password: password.value
+      },
+      context: {
+        headers: {
+          Authorization: '' 
+        }
       }
     })
 
