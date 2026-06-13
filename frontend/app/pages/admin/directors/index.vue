@@ -4,7 +4,7 @@
     <!-- Header -->
     <div class="flex items-center justify-between mb-10">
       <div>
-        <h1 class="text-4xl font-luxury uppercase italic tracking-tighter mb-2">Manage <span class="text-[#EAB308]">Directors .</span></h1>
+        <h1 class="text-4xl font-black uppercase italic tracking-tighter mb-2">Manage <span class="text-[#EAB308]">Directors .</span></h1>
         <p class="text-gray-500 text-sm font-bold uppercase tracking-widest">Total: {{ directors.length }} Directors</p>
       </div>
 
@@ -21,24 +21,24 @@
       <p class="text-gray-500 font-bold uppercase tracking-widest">No directors found.</p>
     </div>
 
-    <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 pb-20">
-      <div v-for="director in directors" :key="director.id" class="group bg-[#0A0A0A] border border-white/5 rounded-[40px] p-6 flex flex-col items-center hover:border-[#EAB308]/50 transition-all duration-500 shadow-2xl hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+    <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 pb-20">
+      <div v-for="director in directors" :key="director.id" class="bg-[#0D0D0D] border border-white/5 rounded-[35px] p-4 flex flex-col items-center hover:border-white/20 transition group shadow-2xl text-center relative overflow-hidden">
         
-        <div class="w-32 h-32 rounded-full overflow-hidden mb-6 bg-gray-900 border-4 border-white/5 group-hover:border-[#EAB308] transition duration-500 shadow-inner">
-          <img v-if="director.image_url" :src="director.image_url" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
-          <div v-else class="w-full h-full flex items-center justify-center text-gray-700 bg-gray-900">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        <div class="w-24 h-24 rounded-full overflow-hidden mb-4 bg-gray-900 border-2 border-white/10 group-hover:border-[#EAB308] transition duration-500">
+          <img v-if="director.image_url" :src="director.image_url" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+          <div v-else class="w-full h-full flex items-center justify-center text-gray-600">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
           </div>
         </div>
         
-        <h3 class="font-luxury text-lg text-white uppercase tracking-tight mb-6 text-center line-clamp-1 group-hover:text-[#EAB308] transition duration-500">{{ director.name }}</h3>
+        <h3 class="font-black text-sm uppercase leading-tight line-clamp-2 mb-4">{{ director.name }}</h3>
         
-        <div class="flex gap-3 w-full mt-auto pt-4 border-t border-white/5">
-          <button @click="openModal(director)" class="flex-1 bg-white/5 hover:bg-white/10 text-white p-3 rounded-2xl transition flex items-center justify-center">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+        <div class="flex gap-2 w-full mt-auto">
+          <button @click="openModal(director)" class="flex-1 bg-white/5 hover:bg-white/10 text-white py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition">
+            Edit
           </button>
-          <button @click="confirmDelete(director.id)" class="flex-1 bg-red-500/10 hover:bg-red-500/20 text-red-500 p-3 rounded-2xl transition flex items-center justify-center">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+          <button @click="confirmDelete(director.id)" class="bg-red-500/10 hover:bg-red-500/20 text-red-500 p-2 rounded-xl transition">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
           </button>
         </div>
       </div>
@@ -246,7 +246,7 @@ const confirmDelete = (id: string) => {
 const executeDelete = async () => {
   if (!directorToDelete.value) return
   isDeleting.value = true
-  
+
   try {
     const client = resolveClient()
     await client.mutate({
