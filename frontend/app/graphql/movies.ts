@@ -122,6 +122,38 @@ export const CREATE_BOOKING = gql`
   }
 `;
 
+export const GET_MY_PROFILE = gql`
+  query GetMyProfile {
+    users {
+      id
+      full_name
+      email
+      role
+      created_at
+      bookings(order_by: { created_at: desc }) {
+        id
+        booking_reference
+        total_price
+        payment_status
+        created_at
+        schedule {
+          start_time
+          end_time
+          movie {
+            id
+            title
+            main_image
+            duration_minutes
+          }
+        }
+        booking_seats {
+          seat_id
+        }
+      }
+    }
+  }
+`;
+
 export const GET_ME = gql`
   query GetMe {
     users {
