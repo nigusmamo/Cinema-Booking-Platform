@@ -6,7 +6,7 @@
       <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-4">
 
         <!-- Back -->
-        <NuxtLink to="/schedules"
+        <NuxtLink :to="`/movies/${movie?.id}`"
           class="w-8 h-8 flex items-center justify-center rounded-lg text-white/30 hover:text-white/70 hover:bg-white/[0.05] transition-all flex-shrink-0">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
@@ -146,6 +146,70 @@
     <!-- Footer spacer -->
     <div class="h-36 sm:h-28"></div>
 
+    <!-- Auth prompt modal -->
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="showAuthModal" class="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-4 sm:p-6">
+          <!-- Backdrop -->
+          <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" @click="showAuthModal = false"></div>
+
+          <!-- Panel -->
+          <div class="relative w-full max-w-sm bg-[#0D0D0D] border border-white/[0.08] rounded-2xl overflow-hidden">
+
+            <!-- Top accent -->
+            <div class="h-px w-full bg-gradient-to-r from-transparent via-[#EAB308]/50 to-transparent"></div>
+
+            <div class="p-6">
+              <!-- Icon -->
+              <div class="w-10 h-10 bg-[#EAB308]/10 border border-[#EAB308]/20 rounded-xl flex items-center justify-center mb-4">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#EAB308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                </svg>
+              </div>
+
+              <!-- Text -->
+              <h2 class="text-white font-semibold text-[17px] mb-1 leading-snug">Sign in to complete your booking</h2>
+              <p class="text-white/35 text-[13px] leading-relaxed mb-5">Create a free account or sign in to confirm your seats. Your selection will be saved.</p>
+
+              <!-- Booking snapshot -->
+              <div class="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 mb-5 space-y-2.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-semibold tracking-[0.22em] text-white/25 uppercase">Selected Seats</span>
+                  <div class="flex gap-1 flex-wrap justify-end max-w-[180px]">
+                    <span v-for="s in selectedSeats" :key="s"
+                      class="bg-[#EAB308]/[0.08] border border-[#EAB308]/20 text-[#EAB308] px-2 py-0.5 rounded text-[10px] font-semibold">
+                      {{ s }}
+                    </span>
+                  </div>
+                </div>
+                <div class="h-px bg-white/[0.05]"></div>
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-semibold tracking-[0.22em] text-white/25 uppercase">Total</span>
+                  <span class="text-white font-bold text-[15px]">{{ totalPrice.toLocaleString() }} <span class="text-white/30 text-[11px] font-normal">ETB</span></span>
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="flex flex-col gap-2.5">
+                <button @click="goToAuth('/auth/login')"
+                  class="w-full bg-[#EAB308] text-black py-3 rounded-xl font-bold text-[11px] tracking-[0.16em] uppercase hover:bg-[#d4a007] transition-colors">
+                  Sign In
+                </button>
+                <button @click="goToAuth('/auth/signup')"
+                  class="w-full bg-white/[0.05] border border-white/[0.08] text-white/70 py-3 rounded-xl font-bold text-[11px] tracking-[0.16em] uppercase hover:bg-white/[0.08] hover:text-white transition-colors">
+                  Create Account
+                </button>
+                <button @click="showAuthModal = false"
+                  class="w-full text-white/25 py-2 text-[11px] hover:text-white/50 transition-colors">
+                  Continue browsing
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
     <!-- Sticky booking footer -->
     <div class="fixed bottom-0 left-0 right-0 z-50 bg-[#090909]/95 backdrop-blur-xl border-t border-white/[0.06]">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -190,8 +254,9 @@ import { GET_SCHEDULE_SEATS, GET_BOOKED_SEATS, GET_SEAT_PRICES } from '~/graphql
 
 const route = useRoute()
 const scheduleId = route.query.schedule_id
-const { saveBooking } = useBookingStore()
+const { saveBooking, loadBooking, selectedMovie: savedMovie, selectedSeats: savedSeats } = useBookingStore()
 const authCookie = useCookie('auth_token')
+const showAuthModal = ref(false)
 
 const { data: scheduleData, pending } = await useAsyncQuery<any>(GET_SCHEDULE_SEATS, {
   schedule_id: scheduleId
@@ -211,6 +276,13 @@ const alreadyBookedList = computed(() => {
 
 const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 const selectedSeats = ref<string[]>([])
+
+onMounted(() => {
+  loadBooking()
+  if (savedMovie.value?.schedule_id === scheduleId && savedSeats.value.length > 0) {
+    selectedSeats.value = [...savedSeats.value]
+  }
+})
 
 const getSeatType = (row: string) => row === 'A' ? 'vip' : (row === 'B' ? 'couple' : 'standard')
 
@@ -241,15 +313,11 @@ const isSeatBooked = (row: string, col: number) => {
 const totalPrice = computed(() => selectedSeats.value.reduce((total, id) => total + getPrice(id.charAt(0)), 0))
 
 const handleBooking = async () => {
-  const authCookie = useCookie('auth_token');
+  if (selectedSeats.value.length === 0) return
 
   if (!authCookie.value) {
-    return navigateTo('/auth/signup');
-  }
-
-  if (selectedSeats.value.length === 0) {
-    alert("Please select at least one seat!");
-    return;
+    showAuthModal.value = true
+    return
   }
 
   if (movie.value) {
@@ -258,12 +326,24 @@ const handleBooking = async () => {
       main_image: movie.value.main_image,
       id: movie.value.id,
       schedule_id: scheduleId
-    };
-
-    console.log("Saving data to storage:", cleanMovieData);
-    saveBooking(cleanMovieData, selectedSeats.value, totalPrice.value);
-    await navigateTo('/booking/summary');
+    }
+    saveBooking(cleanMovieData, selectedSeats.value, totalPrice.value)
+    await navigateTo('/booking/summary')
   }
+}
+
+const goToAuth = (path: string) => {
+  if (movie.value) {
+    saveBooking(
+      { title: movie.value.title, main_image: movie.value.main_image, id: movie.value.id, schedule_id: scheduleId },
+      selectedSeats.value,
+      totalPrice.value
+    )
+  }
+  if (import.meta.client) {
+    localStorage.setItem('cinema_redirect_after_login', '/booking/summary')
+  }
+  navigateTo(path)
 }
 </script>
 
@@ -271,4 +351,11 @@ const handleBooking = async () => {
 /* Hide scrollbar while keeping scroll functionality */
 .seat-scroll::-webkit-scrollbar { display: none; }
 .seat-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Modal transition */
+.modal-enter-active, .modal-leave-active { transition: opacity 0.2s ease; }
+.modal-enter-active .relative, .modal-leave-active .relative { transition: transform 0.25s ease, opacity 0.2s ease; }
+.modal-enter-from, .modal-leave-to { opacity: 0; }
+.modal-enter-from .relative { transform: translateY(16px); opacity: 0; }
+.modal-leave-to .relative { transform: translateY(8px); opacity: 0; }
 </style>

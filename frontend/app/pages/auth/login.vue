@@ -1,5 +1,11 @@
 <template>
   <div class="min-h-screen bg-[#090909] flex items-center justify-center p-4 font-sans">
+    <NuxtLink to="/"
+      class="fixed top-4 left-4 z-10 w-8 h-8 flex items-center justify-center rounded-lg text-white/30 hover:text-white/70 hover:bg-white/[0.05] transition-all">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+      </svg>
+    </NuxtLink>
     <div class="w-full max-w-sm">
 
       <!-- Logo mark -->
@@ -86,7 +92,11 @@ const handleLogin = async () => {
 
       await fetchUser(token)
 
-      if (isAdmin.value) {
+      const pendingRedirect = import.meta.client ? localStorage.getItem('cinema_redirect_after_login') : null
+      if (pendingRedirect) {
+        localStorage.removeItem('cinema_redirect_after_login')
+        await navigateTo(pendingRedirect)
+      } else if (isAdmin.value) {
         await navigateTo('/admin/movies')
       } else {
         await navigateTo('/')
