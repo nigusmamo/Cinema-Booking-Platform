@@ -1,42 +1,45 @@
 <template>
-  <div class="min-h-screen bg-bg-main flex items-center justify-center p-4 font-sans text-white">
-    <div class="max-w-md w-full bg-bg-card p-8 rounded-2xl border border-gray-800 shadow-2xl">
-      <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold mb-2">Create Account</h1>
-        <p class="text-text-soft text-sm">Join us and enjoy the best</p> 
+  <div class="min-h-screen bg-[#090909] flex items-center justify-center p-4 font-sans">
+    <div class="w-full max-w-sm">
+
+      <!-- Logo mark -->
+      <div class="text-center mb-10">
+        <div class="inline-flex items-center gap-2 mb-6">
+          <div class="w-6 h-6 bg-[#EAB308] rounded-md flex items-center justify-center flex-shrink-0">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="black">
+              <rect x="3" y="3" width="18" height="13" rx="2" ry="2"/>
+              <path d="M12 6.5L13.5 9H16l-2 2 .75 2.75L12 12.5l-2.75 1.25L10 11l-2-2h2.5L12 6.5z" fill="black"/>
+            </svg>
+          </div>
+          <span class="text-[12px] font-semibold tracking-[0.15em] uppercase text-white/70">
+            Ethio <span class="text-[#EAB308]">Cinema</span>
+          </span>
+        </div>
+        <h1 class="text-white/85 text-2xl font-light mb-1.5">Create your account</h1>
+        <p class="text-white/30 text-[13px]">Join us and enjoy the best of cinema</p>
       </div>
-      <div v-if="errorMessage" class="mb-6 p-3 bg-red-500/10 border border-red-500 text-red-500 text-sm rounded-lg text-center">
+
+      <!-- Error -->
+      <div v-if="errorMessage" class="mb-5 px-4 py-3 bg-red-500/[0.06] border border-red-500/20 text-red-400 text-[12px] rounded-xl text-center">
         {{ errorMessage }}
       </div>
 
-      <form @submit.prevent="handleSignup">
-        <BaseInput
-          v-model="fullName"
-          label="Full Name"
-          placeholder="Enter your full name"
-        />
-        <BaseInput
-          v-model="email"
-          label="Email"
-          type="email"
-          placeholder="Enter your email address"
-        />
-        <BaseInput
-          v-model="password"
-          label="Password"
-          type="password"
-          placeholder="Enter your password"
-        />
-
-        <BaseButton :loading="isRegistering" class="mt-4">Sign Up</BaseButton>
+      <!-- Form -->
+      <form @submit.prevent="handleSignup" class="space-y-1">
+        <BaseInput v-model="fullName" label="Full Name" placeholder="Your full name" />
+        <BaseInput v-model="email" label="Email" type="email" placeholder="Email Address" />
+        <BaseInput v-model="password" label="Password" type="password" placeholder="Choose a strong password" />
+        <div class="pt-3">
+          <BaseButton :loading="isRegistering">Create Account</BaseButton>
+        </div>
       </form>
 
-      <div class="mt-8 text-center border-t border-gray-800 pt-6">
-        <p class="text-sm text-text-soft">
-          Already have an account? 
-          <NuxtLink to="/auth/login" class="text-primary font-bold hover:underline">Login</NuxtLink>
-        </p>
-      </div>
+      <!-- Footer link -->
+      <p class="text-center text-[12px] text-white/25 mt-8">
+        Already have an account?
+        <NuxtLink to="/auth/login" class="text-white/55 hover:text-white transition-colors ml-1">Sign in</NuxtLink>
+      </p>
+
     </div>
   </div>
 </template>
@@ -49,8 +52,6 @@ const email = ref('')
 const password = ref('')
 const isRegistering = ref(false)
 const errorMessage = ref('')
-
-
 
 const handleSignup = async () => {
   if (!fullName.value || !email.value || !password.value) {
@@ -72,7 +73,7 @@ const handleSignup = async () => {
       },
       context: {
         headers: {
-          Authorization: '' 
+          Authorization: ''
         }
       }
     })

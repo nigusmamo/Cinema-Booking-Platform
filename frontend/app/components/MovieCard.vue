@@ -1,19 +1,20 @@
 <template>
-  <div class="group relative bg-bg-card rounded-xl overflow-hidden border border-gray-800 hover:border-primary/50 transition duration-500">
-    <div class="aspect-[6/7] overflow-hidden">
-      <img :src="image" referrerpolicy="no-referrer" :alt="title" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+  <div class="group cursor-pointer">
+    <div class="relative aspect-[2/3] rounded-2xl overflow-hidden bg-white/[0.03] mb-3">
+      <img
+        :src="image"
+        referrerpolicy="no-referrer"
+        :alt="title"
+        class="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
+      />
+      <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
     </div>
-    
-    <div class="p-4 bg-gradient-to-t from-black to-transparent">
-      <div class="flex items-center gap-2 mb-1">
-        <span class="text-text-soft text-xs">{{ duration }} min</span>
+    <div class="px-0.5">
+      <h3 class="text-white/80 text-[13px] font-medium leading-snug truncate mb-1">{{ title }}</h3>
+      <div class="flex items-center justify-between">
+        <span class="text-[#EAB308] text-[11px] font-semibold">★ {{ rating }}</span>
+        <span class="text-white/25 text-[11px]">{{ duration }}m</span>
       </div>
-      <h3 class="font-bold text-lg leading-tight truncate">{{ title }}</h3>
-      <p class="text-primary text-sm font-medium mt-1">★ {{ rating }}</p>
-      
-      <button class="w-full mt-4 py-2 bg-white/10 hover:bg-primary hover:text-black rounded-lg text-sm font-bold transition">
-        Book Now
-      </button>
     </div>
   </div>
 </template>

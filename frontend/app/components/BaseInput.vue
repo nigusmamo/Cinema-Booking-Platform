@@ -1,6 +1,6 @@
 <template>
   <div class="mb-4">
-    <label v-if="label" class="block text-sm font-medium text-gray-400 mb-1">
+    <label v-if="label" class="block text-[11px] font-medium tracking-[0.18em] text-white/35 uppercase mb-2">
       {{ label }}
     </label>
     <input
@@ -8,7 +8,7 @@
       :placeholder="placeholder"
       :value="modelValue"
       @input="$emit('update:modelValue', $event.target.value)"
-      class="w-full px-4 py-3 bg-bg-card border border-gray-800 text-white rounded-lg focus:outline-none focus:border-primary transition"
+      class="w-full px-4 py-3 bg-transparent border border-white/[0.09] text-white/80 rounded-xl text-[13px] focus:outline-none focus:border-white/[0.22] transition-colors placeholder:text-white/[0.2]"
     />
   </div>
 </template>

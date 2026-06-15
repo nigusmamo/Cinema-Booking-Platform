@@ -1,0 +1,18 @@
+table:
+  name: seat_prices
+  schema: public
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - type
+        - price
+      filter: {}
+    comment: ""
+  - role: user
+    permission:
+      columns:
+        - type
+        - price
+      filter: {}
+    comment: ""

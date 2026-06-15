@@ -1,52 +1,65 @@
 <template>
-  <div class="bg-[#0D0D0D] border border-white/5 rounded-[35px] p-4 flex gap-4 hover:border-white/20 transition group shadow-2xl relative overflow-hidden">
-    
+  <div class="group bg-[#0D0D0D] border border-white/[0.06] rounded-2xl overflow-hidden hover:border-white/[0.12] transition-all duration-300 flex gap-0">
+
     <!-- Image -->
-    <div class="w-24 h-32 md:w-32 md:h-44 rounded-[24px] overflow-hidden flex-shrink-0 bg-gray-900 border border-white/5">
-      <img :src="movie.main_image" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+    <div class="w-[88px] md:w-[112px] flex-shrink-0">
+      <img :src="movie.main_image" class="w-full h-full object-cover" />
     </div>
 
-    <!-- Details -->
-    <div class="flex-1 py-2 flex flex-col justify-between min-w-0">
+    <!-- Content -->
+    <div class="flex-1 p-5 flex flex-col justify-between min-w-0">
       <div>
-        <h3 class="font-black text-xl uppercase leading-tight line-clamp-1 mb-1 truncate">{{ movie.title }}</h3>
-        
-        <div class="flex flex-wrap items-center gap-2 mb-2 text-[9px] text-gray-500 font-bold tracking-widest uppercase">
-          <span>{{ movie.duration_minutes }} MIN</span>
-          <span>•</span>
+        <h3 class="text-[13px] font-semibold text-white line-clamp-1 mb-1">{{ movie.title }}</h3>
+
+        <div class="flex items-center gap-2.5 text-[10px] text-white/30 font-medium mb-2">
+          <span>{{ movie.duration_minutes }}m</span>
+          <span class="text-white/15">·</span>
           <span class="text-[#EAB308]">★ {{ movie.rating_avg }}</span>
-          <span v-if="movie.movie_directors?.length">
-            • DIR: {{ movie.movie_directors[0].director.name }}
-          </span>
+          <span v-if="movie.movie_directors?.length" class="text-white/15">·</span>
+          <span v-if="movie.movie_directors?.length" class="truncate">{{ movie.movie_directors[0].director.name }}</span>
         </div>
 
         <div class="flex flex-wrap gap-1 mb-2">
-          <span v-for="g in movie.movie_genres?.slice(0, 3)" :key="g.genre.name" class="bg-white/5 px-2 py-0.5 rounded text-[8px] text-gray-400 border border-white/5 uppercase">
+          <span
+            v-for="g in movie.movie_genres?.slice(0, 3)"
+            :key="g.genre.name"
+            class="bg-white/[0.04] border border-white/[0.06] px-2 py-0.5 rounded text-[9px] text-white/35 uppercase tracking-wider"
+          >
             {{ g.genre.name }}
           </span>
         </div>
 
-        <div v-if="movie.movie_stars?.length" class="flex flex-wrap gap-1 mb-2">
-          <span v-for="s in movie.movie_stars?.slice(0, 3)" :key="s.star.name" class="text-[9px] text-gray-500 font-bold uppercase">
-            {{ s.star.name }}{{ movie.movie_stars.indexOf(s) < Math.min(movie.movie_stars.length, 3) - 1 ? ',' : '' }}
-          </span>
-          <span v-if="movie.movie_stars?.length > 3" class="text-[9px] text-gray-500">...</span>
-        </div>
-
-        <div class="mb-3">
-          <span class="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest" :class="movie.status === 'now_showing' ? 'bg-green-500/10 text-green-500' : movie.status === 'coming_soon' ? 'bg-blue-500/10 text-blue-500' : 'bg-gray-500/10 text-gray-500'">
-            {{ movie.status.replace('_', ' ') }}
-          </span>
-        </div>
+        <span
+          class="px-2 py-0.5 rounded text-[9px] font-semibold uppercase tracking-wider"
+          :class="movie.status === 'now_showing'
+            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+            : movie.status === 'coming_soon'
+              ? 'bg-sky-500/10 text-sky-400 border border-sky-500/20'
+              : 'bg-white/[0.04] text-white/30 border border-white/[0.06]'"
+        >
+          {{ movie.status.replace('_', ' ') }}
+        </span>
       </div>
 
       <!-- Actions -->
-      <div class="flex items-center gap-2 mt-auto">
-        <NuxtLink :to="`/admin/movies/${movie.id}`" class="bg-white/5 hover:bg-white/10 text-white p-2 rounded-xl transition flex items-center justify-center">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+      <div class="flex items-center gap-1.5 mt-auto pt-3 border-t border-white/[0.05]">
+        <NuxtLink
+          :to="`/admin/movies/${movie.id}`"
+          class="w-7 h-7 flex items-center justify-center rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-white/40 hover:text-white/80 transition-all"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+          </svg>
         </NuxtLink>
-        <button @click="$emit('delete', movie.id)" class="bg-red-500/10 hover:bg-red-500/20 text-red-500 p-2 rounded-xl transition">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        <button
+          @click="$emit('delete', movie.id)"
+          class="w-7 h-7 flex items-center justify-center rounded-lg bg-red-500/[0.06] hover:bg-red-500/[0.14] text-red-500/50 hover:text-red-400 transition-all"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
         </button>
       </div>
     </div>

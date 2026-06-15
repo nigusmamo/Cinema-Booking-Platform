@@ -1,56 +1,59 @@
 <template>
-  <div class="max-w-4xl mx-auto pb-20">
-    
-    <!-- Header -->
-    <div class="flex items-center gap-4 mb-8">
-      <NuxtLink to="/admin/schedules" class="bg-white/5 p-3 rounded-xl hover:bg-white/10 transition">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-      </NuxtLink>
-      <div>
-        <h1 class="text-3xl font-black uppercase italic tracking-tighter">Add <span class="text-[#EAB308]">Schedule .</span></h1>
-      </div>
-    </div>
+  <div class="pb-16">
 
-    <div class="bg-[#0D0D0D] border border-white/5 rounded-[35px] shadow-2xl p-8 md:p-10">
-      <form @submit="onSubmit" class="space-y-8">
-        
-        <div v-if="errorMessage" class="bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-xl text-sm font-bold">
+    <!-- Back Link -->
+    <NuxtLink to="/admin/schedules" class="inline-flex items-center gap-2 text-white/30 hover:text-white/60 text-[12px] font-semibold mb-6 transition-all">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      Back to Schedules
+    </NuxtLink>
+
+    <!-- Title -->
+    <h1 class="text-[20px] font-semibold text-white tracking-tight mb-8">Add Schedule <span class="text-[#EAB308]">.</span></h1>
+
+    <!-- Form Card -->
+    <div class="max-w-xl bg-[#0D0D0D] border border-white/[0.06] rounded-2xl p-6">
+      <form @submit="onSubmit" class="space-y-6">
+
+        <div v-if="errorMessage" class="bg-red-500/[0.07] border border-red-500/[0.15] text-red-400 px-4 py-3 rounded-xl text-[12px]">
           {{ errorMessage }}
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="md:col-span-2">
-            <label class="block text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2">Select Movie</label>
-            <select v-model="movie_id" class="w-full bg-black border border-white/10 px-6 py-4 rounded-2xl focus:outline-none focus:border-[#EAB308] text-white transition appearance-none cursor-pointer" :class="{ 'border-red-500': errors.movie_id }">
-              <option value="" disabled>Select a movie</option>
-              <option v-for="movie in movies" :key="movie.id" :value="movie.id">{{ movie.title }}</option>
-            </select>
-            <p v-if="errors.movie_id" class="text-red-500 text-[10px] mt-1 uppercase font-bold">{{ errors.movie_id }}</p>
-          </div>
+        <!-- Movie Select -->
+        <div>
+          <label class="block text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35 mb-2">Select Movie</label>
+          <select v-model="movie_id" class="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#EAB308]/50 transition-all appearance-none cursor-pointer" :class="{ 'border-red-500/50': errors.movie_id }">
+            <option value="" disabled>Select a movie</option>
+            <option v-for="movie in movies" :key="movie.id" :value="movie.id">{{ movie.title }}</option>
+          </select>
+          <p v-if="errors.movie_id" class="text-red-400/80 text-[10px] mt-1.5">{{ errors.movie_id }}</p>
+        </div>
 
+        <!-- Start + End Time -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2">Start Time</label>
-            <input v-model="start_time" type="datetime-local" class="w-full bg-black border border-white/10 px-6 py-4 rounded-2xl focus:outline-none focus:border-[#EAB308] text-white transition" :class="{ 'border-red-500': errors.start_time }" style="color-scheme: dark;">
-            <p v-if="errors.start_time" class="text-red-500 text-[10px] mt-1 uppercase font-bold">{{ errors.start_time }}</p>
+            <label class="block text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35 mb-2">Start Time</label>
+            <input v-model="start_time" type="datetime-local" class="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#EAB308]/50 transition-all" :class="{ 'border-red-500/50': errors.start_time }" style="color-scheme: dark;">
+            <p v-if="errors.start_time" class="text-red-400/80 text-[10px] mt-1.5">{{ errors.start_time }}</p>
           </div>
-
           <div>
-            <label class="block text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2">End Time</label>
-            <input v-model="end_time" type="datetime-local" class="w-full bg-black border border-white/10 px-6 py-4 rounded-2xl focus:outline-none focus:border-[#EAB308] text-white transition" :class="{ 'border-red-500': errors.end_time }" style="color-scheme: dark;">
-            <p v-if="errors.end_time" class="text-red-500 text-[10px] mt-1 uppercase font-bold">{{ errors.end_time }}</p>
+            <label class="block text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35 mb-2">End Time</label>
+            <input v-model="end_time" type="datetime-local" class="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#EAB308]/50 transition-all" :class="{ 'border-red-500/50': errors.end_time }" style="color-scheme: dark;">
+            <p v-if="errors.end_time" class="text-red-400/80 text-[10px] mt-1.5">{{ errors.end_time }}</p>
           </div>
         </div>
 
-        <div class="pt-8 flex justify-end">
-          <button 
-            type="submit" 
-            class="bg-[#EAB308] text-black px-12 py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:scale-105 active:scale-95 transition shadow-xl shadow-[#EAB308]/20 flex items-center justify-center min-w-[200px]"
-            :disabled="isSubmitting"
-          >
-            <span v-if="isSubmitting" class="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>
-            <span v-else>Save Schedule</span>
-          </button>
-        </div>
+        <!-- Submit -->
+        <button
+          type="submit"
+          class="w-full inline-flex items-center justify-center gap-2 bg-[#EAB308] text-black py-3 rounded-xl text-[12px] font-bold tracking-[0.14em] uppercase hover:bg-[#d4a007] active:scale-[0.98] transition-all"
+          :disabled="isSubmitting"
+        >
+          <span v-if="isSubmitting" class="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>
+          <span v-else>Save Schedule</span>
+        </button>
 
       </form>
     </div>
@@ -60,7 +63,7 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'admin' })
 import { useForm, useField } from 'vee-validate'
-import { 
+import {
   INSERT_SCHEDULE,
   GET_ADMIN_FORM_DATA,
   GET_ADMIN_SCHEDULES
@@ -100,7 +103,7 @@ const errorMessage = ref('')
 const onSubmit = handleSubmit(async (values: ScheduleFormValues) => {
   errorMessage.value = ''
   isSubmitting.value = true
-  
+
   try {
     const client = resolveClient()
     const headers = { Authorization: `Bearer ${authCookie.value}` }

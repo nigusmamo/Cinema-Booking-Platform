@@ -1,157 +1,188 @@
 <template>
-  <div class="max-w-4xl mx-auto pb-20">
-    
-    <!-- Header -->
-    <div class="flex items-center gap-4 mb-8">
-      <NuxtLink to="/admin/movies" class="bg-white/5 p-3 rounded-xl hover:bg-white/10 transition">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-      </NuxtLink>
-      <div>
-        <h1 class="text-3xl font-luxury uppercase italic tracking-tighter">Edit <span class="text-[#EAB308]">Movie .</span></h1>
-      </div>
-    </div>
+  <div class="pb-16">
 
+    <!-- Back Link -->
+    <NuxtLink to="/admin/movies" class="inline-flex items-center gap-2 text-white/30 hover:text-white/60 text-[12px] font-semibold mb-6 transition-all">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      Back to Movies
+    </NuxtLink>
+
+    <!-- Title -->
+    <h1 class="text-[20px] font-semibold text-white tracking-tight mb-8">Edit Movie</h1>
+
+    <!-- Loading -->
     <div v-if="pendingData" class="flex justify-center py-20">
-      <span class="w-10 h-10 border-4 border-[#EAB308]/30 border-t-[#EAB308] rounded-full animate-spin"></span>
+      <span class="w-8 h-8 border-2 border-[#EAB308]/20 border-t-[#EAB308] rounded-full animate-spin"></span>
     </div>
 
-    <div v-else class="bg-[#0D0D0D] border border-white/5 rounded-[35px] shadow-2xl p-8 md:p-10">
-      <form @submit.prevent="handleSubmit" class="space-y-8">
-        
-        <div v-if="errorMessage" class="bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-xl text-sm font-bold">
+    <!-- Two-panel layout -->
+    <div v-else class="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8">
+
+      <!-- LEFT PANEL: Form -->
+      <div class="bg-[#0D0D0D] border border-white/[0.06] rounded-2xl p-6 space-y-6">
+
+        <!-- Error -->
+        <div v-if="errorMessage" class="bg-red-500/[0.07] border border-red-500/[0.15] text-red-400 px-4 py-3 rounded-xl text-[12px]">
           {{ errorMessage }}
         </div>
 
-        <!-- Basic Info -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="md:col-span-2">
-            <label class="block text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2">Movie Title</label>
-            <input v-model="form.title" type="text" required class="w-full bg-black border border-white/10 px-6 py-4 rounded-2xl focus:outline-none focus:border-[#EAB308] text-white transition" placeholder="e.g. Inception">
-          </div>
+        <form @submit.prevent="handleSubmit" class="space-y-6">
+          <!-- Section label -->
+          <p class="text-[10px] font-semibold tracking-[0.22em] uppercase text-white/25">Basic Info</p>
 
-          <div class="md:col-span-2">
-            <label class="block text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2">Description</label>
-            <textarea v-model="form.description" required rows="4" class="w-full bg-black border border-white/10 px-6 py-4 rounded-2xl focus:outline-none focus:border-[#EAB308] text-white transition resize-none" placeholder="Movie synopsis..."></textarea>
-          </div>
-
+          <!-- Title -->
           <div>
-            <label class="block text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2">Duration (Minutes)</label>
-            <input v-model="form.duration_minutes" type="number" required class="w-full bg-black border border-white/10 px-6 py-4 rounded-2xl focus:outline-none focus:border-[#EAB308] text-white transition" placeholder="120">
+            <label class="block text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35 mb-2">Movie Title</label>
+            <input v-model="form.title" type="text" required class="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#EAB308]/50 transition-all" placeholder="e.g. Inception">
           </div>
 
+          <!-- Description -->
           <div>
-            <label class="block text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2">Release Date</label>
-            <input v-model="form.release_date" type="date" required class="w-full bg-black border border-white/10 px-6 py-4 rounded-2xl focus:outline-none focus:border-[#EAB308] text-white transition" style="color-scheme: dark;">
+            <label class="block text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35 mb-2">Description</label>
+            <textarea v-model="form.description" required rows="4" class="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#EAB308]/50 transition-all resize-none" placeholder="Movie synopsis..."></textarea>
           </div>
 
-          <div>
-             <label class="block text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2">Status</label>
-             <select v-model="form.status" class="w-full bg-black border border-white/10 px-6 py-4 rounded-2xl focus:outline-none focus:border-[#EAB308] text-white transition appearance-none cursor-pointer">
-               <option value="now_showing">Now Showing</option>
-               <option value="coming_soon">Coming Soon</option>
-               <option value="ended">Ended</option>
-             </select>
-          </div>
-
-          <div>
-            <label class="block text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2">Rating (0-10)</label>
-            <input v-model="form.rating_avg" type="number" step="0.1" required class="w-full bg-black border border-white/10 px-6 py-4 rounded-2xl focus:outline-none focus:border-[#EAB308] text-white transition" placeholder="8.5">
-          </div>
-        </div>
-
-        <!-- Poster Upload -->
-        <div>
-          <label class="block text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2">Main Poster Image</label>
-          <div 
-            @click="mainImageInput?.click()" 
-            @dragover.prevent @drop.prevent="handleDrop($event, 'main')"
-            class="w-full h-64 border-2 border-dashed border-white/10 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:border-[#EAB308] transition overflow-hidden relative group bg-black"
-          >
-            <input type="file" ref="mainImageInput" class="hidden" accept="image/jpeg, image/png" @change="handleFileSelect($event, 'main')">
-            
-            <div v-if="mainImagePreview" class="absolute inset-0">
-              <img :src="mainImagePreview" class="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition" />
-              <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-                <span class="bg-black/80 px-4 py-2 rounded-xl text-xs font-bold">Change Image</span>
-              </div>
+          <!-- Duration + Release Date -->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35 mb-2">Duration (min)</label>
+              <input v-model="form.duration_minutes" type="number" required class="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#EAB308]/50 transition-all" placeholder="120">
             </div>
-            
-            <div v-else class="text-center">
-              <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-[#EAB308]/10 group-hover:text-[#EAB308] transition">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-              </div>
-              <p class="text-sm font-bold">Drag & Drop or Click to Upload</p>
-              <p class="text-[10px] text-gray-500 mt-2 uppercase tracking-widest">JPG or PNG only</p>
+            <div>
+              <label class="block text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35 mb-2">Release Date</label>
+              <input v-model="form.release_date" type="date" required class="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#EAB308]/50 transition-all" style="color-scheme: dark;">
             </div>
           </div>
-        </div>
 
-        <!-- RELATIONAL DROPDOWNS -->
-        <div class="md:col-span-2 space-y-6 pt-4 border-t border-white/5">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Status + Rating -->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35 mb-2">Status</label>
+              <select v-model="form.status" class="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#EAB308]/50 transition-all appearance-none cursor-pointer">
+                <option value="now_showing">Now Showing</option>
+                <option value="coming_soon">Coming Soon</option>
+                <option value="ended">Ended</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35 mb-2">Rating (0–10)</label>
+              <input v-model="form.rating_avg" type="number" step="0.1" required class="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#EAB308]/50 transition-all" placeholder="8.5">
+            </div>
+          </div>
+
+          <!-- Credits section -->
+          <div class="border-t border-white/[0.05] pt-6 space-y-6">
+            <p class="text-[10px] font-semibold tracking-[0.22em] uppercase text-white/25">Credits</p>
+
+            <!-- Director -->
             <div v-if="!pendingFormData">
-              <label class="block text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2">Director</label>
-              <select v-model="form.selectedDirectorId" class="w-full bg-black border border-white/10 px-6 py-4 rounded-2xl focus:outline-none focus:border-[#EAB308] text-white transition appearance-none cursor-pointer">
+              <label class="block text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35 mb-2">Director</label>
+              <select v-model="form.selectedDirectorId" class="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#EAB308]/50 transition-all appearance-none cursor-pointer">
                 <option value="" disabled>Select a director</option>
                 <option v-for="director in formData?.directors" :key="director.id" :value="director.id">{{ director.name }}</option>
               </select>
             </div>
+
+            <!-- Genres -->
             <div v-if="!pendingFormData">
-              <label class="block text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2">Genres</label>
+              <label class="block text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35 mb-2">Genres</label>
               <div class="flex flex-wrap gap-2">
-                <button 
-                  v-for="genre in formData?.genres" 
+                <button
+                  v-for="genre in formData?.genres"
                   :key="genre.id"
                   type="button"
                   @click="toggleRelation('genre_ids', genre.id)"
-                  class="px-4 py-2 rounded-xl text-xs font-bold border transition"
-                  :class="form.genre_ids.includes(genre.id) ? 'bg-[#EAB308] text-black border-[#EAB308]' : 'bg-black border-white/10 hover:border-white/30'"
+                  class="px-3 py-1.5 rounded-lg text-[11px] font-semibold border transition-all"
+                  :class="form.genre_ids.includes(genre.id)
+                    ? 'bg-[#EAB308] border-[#EAB308] text-black'
+                    : 'border-white/[0.08] text-white/35 hover:border-white/[0.16]'"
                 >
                   {{ genre.name }}
                 </button>
               </div>
             </div>
+
+            <!-- Stars -->
+            <div v-if="!pendingFormData">
+              <label class="block text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35 mb-2">Stars</label>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  v-for="star in formData?.stars"
+                  :key="star.id"
+                  type="button"
+                  @click="toggleRelation('star_ids', star.id)"
+                  class="px-3 py-1.5 rounded-lg text-[11px] font-semibold border transition-all"
+                  :class="form.star_ids.includes(star.id)
+                    ? 'bg-[#EAB308] border-[#EAB308] text-black'
+                    : 'border-white/[0.08] text-white/35 hover:border-white/[0.16]'"
+                >
+                  {{ star.name }}
+                </button>
+              </div>
+            </div>
           </div>
 
-          <div v-if="!pendingFormData">
-            <label class="block text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2">Stars (Multi-select)</label>
-            <div class="flex flex-wrap gap-2">
-              <button 
-                v-for="star in formData?.stars" 
-                :key="star.id"
-                type="button"
-                @click="toggleRelation('star_ids', star.id)"
-                class="px-4 py-2 rounded-xl text-xs font-bold border transition"
-                :class="form.star_ids.includes(star.id) ? 'bg-[#EAB308] text-black border-[#EAB308]' : 'bg-black border-white/10 hover:border-white/30'"
-              >
-                {{ star.name }}
-              </button>
+          <!-- Submit -->
+          <button
+            type="submit"
+            class="w-full inline-flex items-center justify-center gap-2 bg-[#EAB308] text-black py-3 rounded-xl text-[12px] font-bold tracking-[0.14em] uppercase hover:bg-[#d4a007] active:scale-[0.98] transition-all"
+            :disabled="isSubmitting"
+          >
+            <span v-if="isSubmitting" class="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>
+            <span v-else>Update Movie</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- RIGHT PANEL: Image upload -->
+      <div class="lg:sticky lg:top-8">
+        <div class="bg-[#0D0D0D] border border-white/[0.06] rounded-2xl overflow-hidden">
+          <div class="px-5 py-4 border-b border-white/[0.05]">
+            <p class="text-[11px] font-semibold text-white/50 tracking-widest uppercase">Poster Image</p>
+          </div>
+
+          <div
+            @click="mainImageInput?.click()"
+            @dragover.prevent @drop.prevent="handleDrop($event, 'main')"
+            class="cursor-pointer transition-all relative"
+          >
+            <input type="file" ref="mainImageInput" class="hidden" accept="image/jpeg, image/png" @change="handleFileSelect($event, 'main')">
+
+            <div class="m-4 rounded-xl border-2 border-dashed border-white/[0.08] h-[280px] flex flex-col items-center justify-center relative overflow-hidden group hover:border-[#EAB308]/40 transition-all">
+              <div v-if="mainImagePreview" class="absolute inset-0">
+                <img :src="mainImagePreview" class="w-full h-full object-cover opacity-70 group-hover:opacity-50 transition" />
+                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                  <span class="bg-black/80 px-4 py-2 rounded-lg text-[11px] font-semibold text-white/70">Change Image</span>
+                </div>
+              </div>
+
+              <div v-else class="text-center px-6">
+                <div class="w-10 h-10 bg-white/[0.04] border border-white/[0.06] rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:border-[#EAB308]/30 group-hover:text-[#EAB308] text-white/20 transition-all">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                  </svg>
+                </div>
+                <p class="text-[12px] font-medium text-white/35 mb-1">Drop poster here</p>
+                <p class="text-[10px] text-white/20">JPG or PNG only</p>
+              </div>
             </div>
           </div>
         </div>
-
-        <!-- Submit -->
-        <div class="pt-8 flex justify-end">
-          <button 
-            type="submit" 
-            class="bg-[#EAB308] text-black px-12 py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:scale-105 active:scale-95 transition shadow-xl shadow-[#EAB308]/20 flex items-center justify-center min-w-[200px]"
-            :disabled="isSubmitting"
-          >
-            <span v-if="isSubmitting" class="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>
-            <span v-else>Update Movie</span>
-          </button>
-        </div>
-
-      </form>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 definePageMeta({ layout: 'admin' })
-import { 
-  GET_ADMIN_FORM_DATA, 
-  UPLOAD_FILE, 
+import {
+  GET_ADMIN_FORM_DATA,
+  UPLOAD_FILE,
   UPDATE_MOVIE,
   DELETE_MOVIE_DIRECTORS,
   INSERT_MOVIE_DIRECTORS,
@@ -207,7 +238,7 @@ onMounted(async () => {
       variables: { id: movieId },
       fetchPolicy: 'no-cache'
     })
-    
+
     const movie = data?.movies_by_pk
     if (movie) {
       form.title = movie.title
@@ -238,7 +269,7 @@ const processFile = (file: File, type: 'main') => {
     errorMessage.value = "Only image files are allowed."
     return
   }
-  
+
   if (type === 'main') {
     mainImageFile.value = file
     const reader = new FileReader()
@@ -269,7 +300,7 @@ const fileToBase64 = (file: File): Promise<string> => {
 const handleSubmit = async () => {
   errorMessage.value = ''
   isSubmitting.value = true
-  
+
   try {
     const client = resolveClient()
     const headers = { Authorization: `Bearer ${authCookie.value}` }
@@ -314,7 +345,7 @@ const handleSubmit = async () => {
     if (form.selectedDirectorId) {
       await client.mutate({
         mutation: INSERT_MOVIE_DIRECTORS,
-        variables: { 
+        variables: {
           objects: [{
             movie_id: movieId,
             director_id: form.selectedDirectorId

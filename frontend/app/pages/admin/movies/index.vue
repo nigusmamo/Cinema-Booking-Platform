@@ -1,50 +1,74 @@
 <template>
-  <div class="max-w-7xl mx-auto">
-    
-    <!-- Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+  <div class="pb-16">
+
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
       <div>
-        <h1 class="text-4xl font-luxury uppercase italic tracking-tighter mb-2">Manage <span class="text-[#EAB308]">Movies .</span></h1>
-        <p class="text-gray-500 text-sm font-bold uppercase tracking-widest">Total: {{ filteredMovies.length }} Movies</p>
+        <p class="text-[10px] font-semibold tracking-[0.3em] text-white/25 uppercase mb-1">Content Library</p>
+        <h1 class="text-[22px] font-semibold text-white tracking-tight leading-none mb-1">Movies</h1>
+        <p class="text-[12px] text-white/30">{{ filteredMovies.length }} total entries</p>
       </div>
 
-      <div class="flex flex-col sm:flex-row gap-4 flex-1 max-w-2xl justify-end">
-        <div class="relative flex-1 max-w-md">
-          <input 
-            v-model="searchQuery" 
-            type="text" 
-            placeholder="Search movies..." 
-            class="w-full bg-[#0D0D0D] border border-white/10 pl-12 pr-4 py-3 rounded-xl focus:outline-none focus:border-[#EAB308] text-white transition placeholder:text-gray-600" 
+      <div class="flex items-center gap-3">
+        <!-- Search -->
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Search movies..."
+            class="w-60 bg-[#111111] border border-white/[0.08] rounded-xl pl-9 pr-4 py-2.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#EAB308]/50 transition-all"
           />
-          <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">🔍</span>
         </div>
-        <NuxtLink to="/admin/movies/create" class="bg-[#EAB308] text-black px-8 py-3 rounded-xl font-black text-xs hover:scale-105 transition shadow-lg text-center flex items-center justify-center whitespace-nowrap">
-          + ADD MOVIE
+
+        <!-- Add Button -->
+        <NuxtLink
+          to="/admin/movies/create"
+          class="inline-flex items-center gap-2 bg-[#EAB308] text-black px-5 py-2.5 rounded-lg text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#d4a007] active:scale-[0.98] transition-all"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Add Movie
         </NuxtLink>
       </div>
     </div>
 
-    <!-- Movies Grid -->
-    <div v-if="pending" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      <div v-for="i in 8" :key="i" class="bg-[#0D0D0D] border border-white/5 rounded-[35px] h-48 animate-pulse"></div>
+    <!-- Skeleton -->
+    <div v-if="pending" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div v-for="i in 6" :key="i" class="rounded-2xl h-[88px] bg-white/[0.03] animate-pulse"></div>
     </div>
 
-    <div v-else-if="filteredMovies.length === 0" class="text-center py-20 bg-[#0D0D0D] border border-white/5 rounded-[35px]">
-      <p class="text-gray-500 font-bold uppercase tracking-widest">No movies found.</p>
+    <!-- Empty State -->
+    <div v-else-if="filteredMovies.length === 0" class="py-20 flex flex-col items-center justify-center gap-3">
+      <div class="w-12 h-12 rounded-2xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-white/20">
+          <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+          <line x1="7" y1="2" x2="7" y2="22"></line>
+          <line x1="17" y1="2" x2="17" y2="22"></line>
+          <line x1="2" y1="12" x2="22" y2="12"></line>
+        </svg>
+      </div>
+      <p class="text-[12px] text-white/25 font-medium">No movies found</p>
     </div>
 
-    <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pb-20">
-      <AdminMovieCard 
-        v-for="movie in filteredMovies" 
-        :key="movie.id" 
-        :movie="movie" 
+    <!-- Movie Grid -->
+    <div v-else class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+      <AdminMovieCard
+        v-for="movie in filteredMovies"
+        :key="movie.id"
+        :movie="movie"
         @delete="confirmDelete"
       />
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <AdminDeleteConfirm 
-      v-if="showDeleteConfirm" 
+    <AdminDeleteConfirm
+      v-if="showDeleteConfirm"
       :is-deleting="isDeleting"
       title="Delete Movie"
       message="Are you sure you want to delete this movie? This will also delete all its schedules and bookings. This action cannot be undone."
@@ -84,7 +108,7 @@ const confirmDelete = (id: string) => {
 const executeDelete = async () => {
   if (!movieToDelete.value) return
   isDeleting.value = true
-  
+
   try {
     const client = resolveClient()
     await client.mutate({

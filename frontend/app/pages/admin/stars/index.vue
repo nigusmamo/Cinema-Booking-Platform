@@ -1,44 +1,81 @@
 <template>
-  <div class="max-w-7xl mx-auto">
-    
-    <!-- Header -->
-    <div class="flex items-center justify-between mb-10">
+  <div class="pb-16">
+
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
       <div>
-        <h1 class="text-4xl font-luxury uppercase italic tracking-tighter mb-2">Manage <span class="text-[#EAB308]">Stars .</span></h1>
-        <p class="text-gray-500 text-sm font-bold uppercase tracking-widest">Total: {{ stars.length }} Stars</p>
+        <p class="text-[10px] font-semibold tracking-[0.3em] text-white/25 uppercase mb-1">Cast &amp; Talent</p>
+        <h1 class="text-[22px] font-semibold text-white tracking-tight leading-none mb-1">Stars</h1>
+        <p class="text-[12px] text-white/30">{{ stars.length }} total stars</p>
       </div>
 
-      <button @click="openModal()" class="bg-[#EAB308] text-black px-8 py-3 rounded-xl font-black text-xs hover:scale-105 transition shadow-lg text-center flex items-center justify-center">
-        + ADD STAR
+      <button
+        @click="openModal()"
+        class="inline-flex items-center gap-2 bg-[#EAB308] text-black px-5 py-2.5 rounded-lg text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#d4a007] active:scale-[0.98] transition-all self-start sm:self-auto"
+      >
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Add Star
       </button>
     </div>
 
-    <div v-if="pending" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-      <div v-for="i in 10" :key="i" class="bg-[#0D0D0D] border border-white/5 rounded-[35px] h-48 animate-pulse"></div>
+    <!-- Skeleton -->
+    <div v-if="pending" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">
+      <div v-for="i in 12" :key="i" class="rounded-2xl h-[190px] bg-white/[0.03] animate-pulse"></div>
     </div>
 
-    <div v-else-if="stars.length === 0" class="text-center py-20 bg-[#0D0D0D] border border-white/5 rounded-[35px]">
-      <p class="text-gray-500 font-bold uppercase tracking-widest">No stars found.</p>
+    <!-- Empty State -->
+    <div v-else-if="stars.length === 0" class="py-20 flex flex-col items-center justify-center gap-3">
+      <div class="w-12 h-12 rounded-2xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-white/20">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+        </svg>
+      </div>
+      <p class="text-[12px] text-white/25 font-medium">No stars found</p>
     </div>
 
-    <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 pb-20">
-      <div v-for="star in stars" :key="star.id" class="group bg-[#0A0A0A] border border-white/5 rounded-[40px] p-6 flex flex-col items-center hover:border-[#EAB308]/50 transition-all duration-500 shadow-2xl hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-        
-        <div class="w-32 h-32 rounded-full overflow-hidden mb-6 bg-gray-900 border-4 border-white/5 group-hover:border-[#EAB308] transition duration-500 shadow-inner">
-          <img v-if="star.image_url" :src="star.image_url" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
-          <div v-else class="w-full h-full flex items-center justify-center text-gray-700 bg-gray-900">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+    <!-- Stars Grid -->
+    <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">
+      <div
+        v-for="star in stars"
+        :key="star.id"
+        class="group bg-[#0D0D0D] border border-white/[0.06] rounded-2xl p-5 flex flex-col items-center text-center hover:border-white/[0.12] transition-all duration-300"
+      >
+        <!-- Photo -->
+        <div class="w-[72px] h-[72px] rounded-2xl overflow-hidden mb-4 bg-white/[0.03] border border-white/[0.06] group-hover:border-[#EAB308]/30 transition-all">
+          <img v-if="star.image_url" :src="star.image_url" class="w-full h-full object-cover">
+          <div v-else class="w-full h-full flex items-center justify-center text-white/15">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
           </div>
         </div>
-        
-        <h3 class="font-luxury text-lg text-white uppercase tracking-tight mb-6 text-center line-clamp-1 group-hover:text-[#EAB308] transition duration-500">{{ star.name }}</h3>
-        
-        <div class="flex gap-3 w-full mt-auto pt-4 border-t border-white/5">
-          <button @click="openModal(star)" class="flex-1 bg-white/5 hover:bg-white/10 text-white p-3 rounded-2xl transition flex items-center justify-center">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+
+        <!-- Name -->
+        <p class="text-[12px] font-semibold text-white/80 group-hover:text-white mb-4 line-clamp-2 transition-colors leading-snug">{{ star.name }}</p>
+
+        <!-- Actions -->
+        <div class="flex gap-2 w-full mt-auto">
+          <button
+            @click="openModal(star)"
+            class="flex-1 flex items-center justify-center py-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-white/35 hover:text-white/70 transition-all"
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
           </button>
-          <button @click="confirmDelete(star.id)" class="flex-1 bg-red-500/10 hover:bg-red-500/20 text-red-500 p-3 rounded-2xl transition flex items-center justify-center">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+          <button
+            @click="confirmDelete(star.id)"
+            class="flex-1 flex items-center justify-center py-2 rounded-lg bg-red-500/[0.06] hover:bg-red-500/[0.14] text-red-500/50 hover:text-red-400 transition-all"
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
           </button>
         </div>
       </div>
@@ -48,54 +85,60 @@
 
   <!-- Modal for Create/Edit -->
   <AdminModal v-if="showModal" :title="editId ? 'Edit Star' : 'Add Star'" @close="closeModal" max-width="max-w-md">
-    <form @submit.prevent="handleSubmit" class="space-y-6">
-      
-      <div v-if="errorMessage" class="bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-xl text-sm font-bold">
+    <form @submit.prevent="handleSubmit" class="space-y-5">
+
+      <div v-if="errorMessage" class="bg-red-500/[0.07] border border-red-500/[0.15] text-red-400 px-4 py-3 rounded-xl text-[12px]">
         {{ errorMessage }}
       </div>
 
       <div>
-        <label class="block text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2">Star Name</label>
-        <input v-model="form.name" type="text" required class="w-full bg-black border border-white/10 px-4 py-4 rounded-2xl focus:outline-none focus:border-[#EAB308] text-white transition" placeholder="e.g. Leonardo DiCaprio">
+        <label class="block text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35 mb-2">Star Name</label>
+        <input v-model="form.name" type="text" required class="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#EAB308]/50 transition-all" placeholder="e.g. Leonardo DiCaprio">
       </div>
 
       <div>
-        <label class="block text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2">Photo</label>
-        <div 
-          @click="imageInput?.click()" 
+        <label class="block text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35 mb-2">Photo</label>
+        <div
+          @click="imageInput?.click()"
           @dragover.prevent @drop.prevent="handleDrop"
-          class="w-full h-40 border-2 border-dashed border-white/10 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:border-[#EAB308] transition overflow-hidden relative group bg-black"
+          class="w-full h-40 border-2 border-dashed border-white/[0.08] rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-[#EAB308]/40 transition-all overflow-hidden relative group bg-[#111111]"
         >
           <input type="file" ref="imageInput" class="hidden" accept="image/jpeg, image/png" @change="handleFileSelect">
-          
+
           <div v-if="imagePreview" class="absolute inset-0">
             <img :src="imagePreview" class="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition" />
             <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-              <span class="bg-black/80 px-4 py-2 rounded-xl text-xs font-bold">Change Image</span>
+              <span class="bg-black/80 px-4 py-2 rounded-lg text-[11px] font-semibold text-white/70">Change Photo</span>
             </div>
           </div>
-          
+
           <div v-else class="text-center">
-            <div class="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-2 group-hover:bg-[#EAB308]/10 group-hover:text-[#EAB308] transition">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            <div class="w-10 h-10 bg-white/[0.04] border border-white/[0.06] rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:border-[#EAB308]/30 group-hover:text-[#EAB308] text-white/20 transition-all">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
             </div>
-            <p class="text-xs font-bold">Upload Photo</p>
+            <p class="text-[11px] font-medium text-white/30">Upload Photo</p>
           </div>
         </div>
       </div>
 
-      <div class="pt-4 flex justify-end">
-        <button type="submit" class="bg-[#EAB308] text-black px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition shadow-xl w-full flex items-center justify-center" :disabled="isSubmitting">
-          <span v-if="isSubmitting" class="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>
-          <span v-else>{{ editId ? 'Update' : 'Save' }} Star</span>
-        </button>
-      </div>
+      <button
+        type="submit"
+        class="w-full inline-flex items-center justify-center gap-2 bg-[#EAB308] text-black py-2.5 rounded-lg text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#d4a007] active:scale-[0.98] transition-all"
+        :disabled="isSubmitting"
+      >
+        <span v-if="isSubmitting" class="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>
+        <span v-else>{{ editId ? 'Update' : 'Save' }} Star</span>
+      </button>
     </form>
   </AdminModal>
 
   <!-- Delete Confirmation Modal -->
-  <AdminDeleteConfirm 
-    v-if="showDeleteConfirm" 
+  <AdminDeleteConfirm
+    v-if="showDeleteConfirm"
     :is-deleting="isDeleting"
     title="Delete Star"
     message="Are you sure you want to delete this star? This might fail if the star is currently attached to any movies."
@@ -106,10 +149,10 @@
 
 <script setup lang="ts">
 definePageMeta({ layout: 'admin' })
-import { 
-  GET_ADMIN_FORM_DATA, 
-  INSERT_STAR, 
-  UPDATE_STAR, 
+import {
+  GET_ADMIN_FORM_DATA,
+  INSERT_STAR,
+  UPDATE_STAR,
   DELETE_STAR,
   UPLOAD_FILE
 } from '~/graphql/admin'
@@ -191,7 +234,7 @@ const fileToBase64 = (file: File): Promise<string> => {
 const handleSubmit = async () => {
   errorMessage.value = ''
   isSubmitting.value = true
-  
+
   try {
     const client = resolveClient()
     const headers = { Authorization: `Bearer ${authCookie.value}` }
@@ -246,7 +289,7 @@ const confirmDelete = (id: string) => {
 const executeDelete = async () => {
   if (!starToDelete.value) return
   isDeleting.value = true
-  
+
   try {
     const client = resolveClient()
     await client.mutate({
