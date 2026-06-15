@@ -32,10 +32,10 @@
             <span class="hidden md:block text-[11px] text-white/25 tracking-wider font-medium">
               {{ user?.full_name }}
             </span>
-            <div @click="handleLogout"
-              class="cursor-pointer w-7 h-7 bg-[#EAB308] rounded-full flex items-center justify-center text-black text-[10px] font-bold hover:scale-110 hover:shadow-[0_0_12px_rgba(234,179,8,0.4)] transition-all duration-200">
+            <NuxtLink to="/profile"
+              class="w-7 h-7 bg-[#EAB308] rounded-full flex items-center justify-center text-black text-[10px] font-bold hover:scale-110 hover:shadow-[0_0_12px_rgba(234,179,8,0.4)] transition-all duration-200">
               {{ userInitial }}
-            </div>
+            </NuxtLink>
           </template>
           <NuxtLink v-else to="/auth/login"
             class="text-[10px] font-semibold tracking-[0.2em] uppercase text-white/45 hover:text-white/80 border border-white/[0.1] hover:border-white/[0.22] px-4 py-2 rounded-lg transition-all duration-200">
@@ -52,15 +52,11 @@
 </template>
 
 <script setup lang="ts">
-const { user, userInitial, isAuthenticated, isAdmin, logout, fetchUser } = useAuth()
+const { user, userInitial, isAuthenticated, isAdmin, fetchUser } = useAuth()
 
 onMounted(() => {
   if (!user.value) {
     fetchUser()
   }
 })
-
-const handleLogout = () => {
-  logout()
-}
 </script>
