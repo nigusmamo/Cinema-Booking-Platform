@@ -229,7 +229,7 @@
 <script setup lang="ts">
 import { CREATE_BOOKING } from '~/graphql/movies'
 
-const { selectedMovie, selectedSeats, totalPrice, loadBooking } = useBookingStore()
+const { selectedMovie, selectedSeats, totalPrice, loadBooking, clearBooking } = useBookingStore()
 const { user, fetchUser } = useAuth()
 const movieInfo = computed(() => selectedMovie.value as any)
 const isSaving = ref(true)
@@ -310,6 +310,7 @@ onMounted(async () => {
 
     if (data?.insert_bookings_one) {
       bookingRef.value = data.insert_bookings_one.booking_reference
+      clearBooking()
     }
   } catch (err: any) {
     console.error("Save error:", err)
