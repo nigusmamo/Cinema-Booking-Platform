@@ -5,6 +5,12 @@
     <div class="max-w-7xl mx-auto px-6 pt-12 pb-6">
 
       <div class="flex items-center gap-5 mb-8">
+        <NuxtLink to="/"
+          class="w-8 h-8 flex items-center justify-center rounded-lg text-white/30 hover:text-white/70 hover:bg-white/[0.05] transition-all flex-shrink-0">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+          </svg>
+        </NuxtLink>
         <span class="text-[10px] font-semibold tracking-[0.28em] text-white/35 uppercase flex-shrink-0">Schedule</span>
         <div class="flex-1 h-px bg-white/[0.05]"></div>
       </div>

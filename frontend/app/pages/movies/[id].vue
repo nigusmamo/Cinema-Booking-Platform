@@ -14,6 +14,14 @@
       <!-- ── HERO ───────────────────────────────────────────── -->
       <div class="relative h-[54vh] w-full overflow-hidden -mt-14 pt-14">
 
+        <!-- Back button -->
+        <NuxtLink to="/schedules"
+          class="absolute top-[62px] left-6 md:left-16 z-10 w-8 h-8 flex items-center justify-center rounded-lg text-white/50 hover:text-white hover:bg-white/[0.07] transition-all">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+          </svg>
+        </NuxtLink>
+
         <!-- Background -->
         <img :src="movie.main_image" class="absolute inset-0 w-full h-full object-cover opacity-20 blur-sm scale-110" referrerpolicy="no-referrer" />
         <div class="absolute inset-0 bg-gradient-to-r from-[#090909]/95 via-[#090909]/60 to-transparent"></div>
