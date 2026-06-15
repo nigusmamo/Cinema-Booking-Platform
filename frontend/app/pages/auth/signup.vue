@@ -76,11 +76,6 @@ const handleSignup = async () => {
         full_name: fullName.value,
         email: email.value,
         password: password.value
-      },
-      context: {
-        headers: {
-          Authorization: ''
-        }
       }
     })
 
