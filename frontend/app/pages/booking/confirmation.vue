@@ -229,9 +229,14 @@
 <script setup lang="ts">
 import { CREATE_BOOKING } from '~/graphql/movies'
 
-const { selectedMovie, selectedSeats, totalPrice, loadBooking, clearBooking } = useBookingStore()
+const { selectedMovie: storeMovie, selectedSeats: storeSeats, totalPrice: storePrice, loadBooking, clearBooking } = useBookingStore()
 const { user, fetchUser } = useAuth()
-const movieInfo = computed(() => selectedMovie.value as any)
+
+// Local display snapshots — populated from store before clearBooking() wipes reactive state
+const movieInfo = ref<any>(null)
+const localSeats = ref<string[]>([])
+const totalPrice = ref(0)
+
 const isSaving = ref(true)
 const errorMessage = ref('')
 const bookingRef = ref('')
@@ -247,7 +252,7 @@ const getSeatType = (seatId: string): 'VIP' | 'Couple' | 'Standard' => {
 
 const seatGroups = computed(() => {
   const map: Record<string, string[]> = {}
-  selectedSeats.value.forEach(s => {
+  localSeats.value.forEach(s => {
     const type = getSeatType(s)
     if (!map[type]) map[type] = []
     map[type].push(s)
@@ -275,11 +280,16 @@ onMounted(async () => {
   const hasData = loadBooking()
   await fetchUser()
 
-  if (!hasData || !selectedMovie.value) {
+  if (!hasData || !storeMovie.value) {
     isSaving.value = false
     errorMessage.value = "No booking information found."
     return
   }
+
+  // Snapshot store data into local refs before clearBooking() resets the store
+  movieInfo.value = { ...storeMovie.value }
+  localSeats.value = [...storeSeats.value]
+  totalPrice.value = storePrice.value
 
   try {
     const client = resolveClient()
@@ -290,7 +300,7 @@ onMounted(async () => {
       throw new Error("User session not found. Please log in.")
     }
 
-    const { data, errors } = await client.mutate({
+    const { data } = await client.mutate({
       mutation: CREATE_BOOKING,
       variables: {
         object: {
@@ -299,7 +309,7 @@ onMounted(async () => {
           booking_reference: "CINE-" + Math.floor(Math.random() * 900000 + 100000),
           payment_status: "completed",
           booking_seats: {
-            data: selectedSeats.value.map(seatId => ({ seat_id: seatId }))
+            data: localSeats.value.map(seatId => ({ seat_id: seatId }))
           }
         }
       },
