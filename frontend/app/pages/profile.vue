@@ -47,6 +47,32 @@
         </button>
       </div>
 
+      <!-- ── SAVED MOVIES ───────────────────────────────── -->
+      <div v-if="!pending && bookmarks.length > 0">
+        <div class="flex items-center gap-4 mb-5">
+          <span class="text-[10px] font-semibold tracking-[0.28em] text-white/25 uppercase flex-shrink-0">Saved Movies</span>
+          <div class="flex-1 h-px bg-white/[0.05]"></div>
+          <span class="text-[10px] text-white/20 flex-shrink-0">{{ bookmarks.length }}</span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-10">
+          <NuxtLink
+            v-for="bm in bookmarks" :key="bm.id"
+            :to="`/movies/${bm.movie?.id}`"
+            class="group relative bg-[#0D0D0D] border border-white/[0.05] hover:border-white/[0.12] rounded-xl overflow-hidden aspect-[2/3] transition-colors duration-200">
+            <img :src="bm.movie?.main_image" referrerpolicy="no-referrer" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+            <div class="absolute bottom-0 left-0 right-0 p-3">
+              <p class="text-white text-[11px] font-semibold leading-tight truncate">{{ bm.movie?.title }}</p>
+              <div class="flex items-center gap-1.5 mt-1">
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="#EAB308"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                <span class="text-white/50 text-[9px]">{{ bm.movie?.rating_avg }}</span>
+                <span class="text-white/25 text-[9px]">· {{ bm.movie?.duration_minutes }}m</span>
+              </div>
+            </div>
+          </NuxtLink>
+        </div>
+      </div>
+
       <!-- ── BOOKING HISTORY ────────────────────────────── -->
       <div class="flex items-center gap-4 mb-5">
         <span class="text-[10px] font-semibold tracking-[0.28em] text-white/25 uppercase flex-shrink-0">Booking History</span>
@@ -144,6 +170,7 @@ const { resolveClient } = useApolloClient()
 
 const pending = ref(true)
 const bookings = ref<any[]>([])
+const bookmarks = ref<any[]>([])
 
 const memberSince = computed(() => {
   if (!user.value?.created_at) return '—'
@@ -165,7 +192,10 @@ onMounted(async () => {
       context: { headers: { Authorization: `Bearer ${authCookie.value}` } }
     })
     const me = data?.users?.[0]
-    if (me) bookings.value = me.bookings ?? []
+    if (me) {
+      bookings.value = me.bookings ?? []
+      bookmarks.value = me.bookmarks ?? []
+    }
   } catch (err) {
     console.error('Profile fetch error:', err)
   } finally {

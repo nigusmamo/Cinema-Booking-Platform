@@ -215,6 +215,13 @@ export const GET_MOVIE_BY_ID = gql`
       movie_directors { director { id name } }
       movie_stars { star { id name } }
       movie_genres { genre { id name } }
+      movie_images { id image_url }
     }
+  }
+`;
+
+export const DELETE_MOVIE_IMAGE_BY_ID = gql`
+  mutation DeleteMovieImageById($id: uuid!) {
+    delete_movie_images_by_pk(id: $id) { id }
   }
 `;
