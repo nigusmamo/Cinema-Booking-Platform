@@ -1,106 +1,175 @@
 <template>
-  <div class="bg-[#0D0D0D] min-h-screen text-white font-sans pb-20">
+  <div class="bg-[#090909] min-h-screen text-white font-sans pb-32">
+
+    <!-- Loading -->
     <div v-if="pending" class="h-screen flex items-center justify-center">
-      <p class="text-[#EAB308] animate-pulse font-bold tracking-widest text-sm uppercase">LOADING MOVIE DETAILS...</p>
+      <div class="text-center">
+        <div class="w-7 h-7 border border-[#EAB308]/30 border-t-[#EAB308] rounded-full animate-spin mx-auto mb-5"></div>
+        <p class="text-white/25 text-[10px] font-medium tracking-[0.32em] uppercase">Loading</p>
+      </div>
     </div>
 
     <div v-else-if="movie">
-      <div class="relative h-[50vh] w-full overflow-hidden -mt-20 pt-20">
-        <img :src="movie.main_image" class="w-full h-full object-cover opacity-40 blur-sm scale-110" referrerpolicy="no-referrer" />
-        <div class="absolute inset-0 bg-gradient-to-t from-[#0D0D0D] via-[#0D0D0D]/60 to-transparent"></div>
-        
-        <div class="absolute inset-0 flex items-end px-6 md:px-20 pb-10">
-          <div class="flex flex-col md:flex-row gap-10 items-end w-full">
-            <img :src="movie.main_image" class="w-48 md:w-64 aspect-[4/5] rounded-[32px] shadow-2xl border-4 border-white/5 object-cover bg-gray-900" referrerpolicy="no-referrer" />
-            <div class="flex-1 text-left">
-              <h1 class="text-4xl md:text-7xl font-black uppercase mb-4 tracking-tighter leading-none">{{ movie.title }}</h1>
-              <div class="flex flex-wrap items-center gap-6 text-gray-400 text-sm font-medium">
-                <span class="text-[#EAB308] flex items-center gap-1 font-bold">★ {{ movie.rating_avg }}</span>
-                <span>🕒 {{ movie.duration_minutes }} min</span>
-                <span>📅 {{ new Date(movie.release_date).getFullYear() }}</span>
-                <div class="flex gap-2">
-                  <span v-for="g in movie.movie_genres" :key="g.genre.name" class="bg-white/5 px-3 py-1 rounded-full text-[11px] text-gray-300 border border-white/5 uppercase">
+
+      <!-- ── HERO ───────────────────────────────────────────── -->
+      <div class="relative h-[54vh] w-full overflow-hidden -mt-14 pt-14">
+
+        <!-- Background -->
+        <img :src="movie.main_image" class="absolute inset-0 w-full h-full object-cover opacity-20 blur-sm scale-110" referrerpolicy="no-referrer" />
+        <div class="absolute inset-0 bg-gradient-to-r from-[#090909]/95 via-[#090909]/60 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#090909] via-[#090909]/20 to-transparent"></div>
+
+        <!-- Content anchored to bottom -->
+        <div class="absolute bottom-0 left-0 right-0 px-6 md:px-16 pb-10">
+          <div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-7 items-end">
+
+            <!-- Poster -->
+            <div class="w-32 md:w-48 aspect-[2/3] rounded-2xl overflow-hidden flex-shrink-0 shadow-2xl border border-white/[0.07] bg-[#111]">
+              <img :src="movie.main_image" class="w-full h-full object-cover" referrerpolicy="no-referrer" />
+            </div>
+
+            <!-- Title + meta -->
+            <div class="pb-1 min-w-0">
+              <h1 class="font-modern-luxury font-light leading-[0.88] tracking-[-0.02em] mb-5 truncate"
+                  style="font-size: clamp(44px, 6vw, 80px)">
+                {{ movie.title }}
+              </h1>
+              <div class="flex flex-wrap items-center gap-4 text-[12px]">
+                <span class="text-[#EAB308] font-semibold flex items-center gap-1.5">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                  </svg>
+                  {{ movie.rating_avg }}
+                </span>
+                <span class="text-white/35">{{ movie.duration_minutes }} min</span>
+                <span class="text-white/35">{{ new Date(movie.release_date).getFullYear() }}</span>
+                <div class="flex gap-1.5 flex-wrap">
+                  <span v-for="g in movie.movie_genres" :key="g.genre.name"
+                    class="border border-white/[0.1] px-3 py-0.5 rounded-full text-[10px] text-white/40 uppercase tracking-wider">
                     {{ g.genre.name }}
                   </span>
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       </div>
 
-      <div class="max-w-7xl mx-auto px-6 md:px-20 mt-12 grid grid-cols-1 lg:grid-cols-3 gap-20">
-        <div class="lg:col-span-2 space-y-12 text-left">
-          <p class="text-gray-400 leading-relaxed text-xl font-medium italic">{{ movie.description }}</p>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
+      <!-- ── MAIN CONTENT ───────────────────────────────────── -->
+      <div class="max-w-7xl mx-auto px-6 md:px-16 mt-12 grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-14">
+
+        <!-- Left column: details -->
+        <div class="lg:col-span-2 space-y-12">
+
+          <!-- Description -->
+          <p class="text-white/40 text-lg md:text-xl font-light leading-relaxed italic">{{ movie.description }}</p>
+
+          <!-- Direction & Stars -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+
             <div>
-              <h3 class="text-gray-500 text-[11px] font-black uppercase tracking-[0.2em] mb-4">Director</h3>
-              <div class="flex flex-wrap gap-3">
-                <div v-for="d in movie.movie_directors" :key="d.director.name" class="flex flex-col items-center gap-2">
-                  <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-white/5 shadow-xl bg-gray-900">
+              <div class="flex items-center gap-3 mb-5">
+                <span class="text-[9px] font-semibold tracking-[0.32em] text-white/25 uppercase">Direction</span>
+                <div class="flex-1 h-px bg-white/[0.05]"></div>
+              </div>
+              <div class="flex flex-wrap gap-4">
+                <div v-for="d in movie.movie_directors" :key="d.director.name" class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full overflow-hidden border border-white/[0.08] bg-[#111] flex-shrink-0">
                     <img :src="d.director.image_url || 'https://ui-avatars.com/api/?name=' + d.director.name + '&background=EAB308&color=000'" class="w-full h-full object-cover" referrerpolicy="no-referrer" />
                   </div>
-                  <p class="text-white font-bold text-[8px] uppercase tracking-wider text-center max-w-[60px] line-clamp-1">
-                    {{ d.director.name }}
-                  </p>
+                  <span class="text-[12px] text-white/55 font-medium">{{ d.director.name }}</span>
                 </div>
               </div>
             </div>
+
             <div>
-              <h3 class="text-gray-500 text-[11px] font-black uppercase tracking-[0.2em] mb-4">Stars</h3>
-              <div class="flex flex-wrap gap-3">
-                <div v-for="s in movie.movie_stars" :key="s.star.name" class="flex flex-col items-center gap-2">
-                  <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-white/5 shadow-xl bg-gray-900">
+              <div class="flex items-center gap-3 mb-5">
+                <span class="text-[9px] font-semibold tracking-[0.32em] text-white/25 uppercase">Starring</span>
+                <div class="flex-1 h-px bg-white/[0.05]"></div>
+              </div>
+              <div class="flex flex-wrap gap-4">
+                <div v-for="s in movie.movie_stars" :key="s.star.name" class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full overflow-hidden border border-white/[0.08] bg-[#111] flex-shrink-0">
                     <img :src="s.star.image_url || 'https://ui-avatars.com/api/?name=' + s.star.name + '&background=EAB308&color=000'" class="w-full h-full object-cover" referrerpolicy="no-referrer" />
                   </div>
-                  <p class="text-white font-bold text-[8px] uppercase tracking-wider text-center max-w-[60px] line-clamp-1">
-                    {{ s.star.name }}
-                  </p>
+                  <span class="text-[12px] text-white/55 font-medium">{{ s.star.name }}</span>
                 </div>
               </div>
             </div>
+
           </div>
 
+          <!-- Gallery -->
           <div v-if="movie.movie_images && movie.movie_images.length > 0">
-            <h3 class="text-gray-500 text-[11px] font-black uppercase tracking-[0.2em] mb-6">Gallery</h3>
-            <div class="grid grid-cols-3 gap-6">
-              <div v-for="img in movie.movie_images.slice(0,3)" :key="img.id" class="aspect-video rounded-[24px] overflow-hidden border border-white/5 shadow-xl bg-gray-900">
-                <img :src="img.image_url" referrerpolicy="no-referrer" class="w-full h-full object-cover hover:scale-110 transition duration-700" />
+            <div class="flex items-center gap-3 mb-5">
+              <span class="text-[9px] font-semibold tracking-[0.32em] text-white/25 uppercase">Gallery</span>
+              <div class="flex-1 h-px bg-white/[0.05]"></div>
+            </div>
+            <div class="grid grid-cols-3 gap-3">
+              <div v-for="img in movie.movie_images.slice(0, 3)" :key="img.id"
+                class="aspect-video rounded-xl overflow-hidden border border-white/[0.05] bg-[#111]">
+                <img :src="img.image_url" referrerpolicy="no-referrer" class="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
               </div>
             </div>
           </div>
+
         </div>
 
-        <div class="relative">
-          <div class="bg-[#121212] border border-white/5 p-8 rounded-[40px] shadow-2xl sticky top-28">
-             <h3 class="text-white font-luxury uppercase mb-8 tracking-tighter text-xl text-center">AVAILABLE <span class="text-[#EAB308]">SHOWS</span></h3>
-             <div class="flex gap-3 overflow-x-auto no-scrollbar py-4 px-2 -mx-2">
-                <div v-for="day in availableDates" :key="day.fullDate" 
-                    @click="selectedDate = day.fullDate"
-                    class="flex-shrink-0 w-20 py-4 rounded-[22px] border border-white/5 text-center cursor-pointer transition-all duration-500"
-                    :class="selectedDate === day.fullDate ? 'bg-[#EAB308] text-black font-black shadow-[0_10px_30px_rgba(234,179,8,0.3)] scale-110' : 'bg-white/5 text-gray-500 hover:bg-white/10'">
-                    <span class="block text-[10px] uppercase font-bold mb-1 opacity-70">{{ day.dayLabel }}</span>
-                    <span class="text-xl font-black">{{ day.dateNumber }}</span>
-               </div>
-             </div>
+        <!-- Right column: booking panel -->
+        <div>
+          <div class="bg-[#0D0D0D] border border-white/[0.06] rounded-2xl overflow-hidden sticky top-20">
 
-             <div class="grid grid-cols-2 gap-4 mb-10">
-                <button v-for="sched in availableTimes" :key="sched.id"
+            <!-- Panel header -->
+            <div class="px-6 pt-5 pb-4 border-b border-white/[0.05]">
+              <h3 class="text-[10px] font-semibold tracking-[0.28em] text-white/30 uppercase">Showtimes</h3>
+            </div>
+
+            <!-- Date picker -->
+            <div class="px-5 py-4">
+              <div class="flex gap-1.5 overflow-x-auto no-scrollbar">
+                <div
+                  v-for="day in availableDates"
+                  :key="day.fullDate"
+                  @click="selectedDate = day.fullDate"
+                  class="flex-shrink-0 w-[58px] py-3 rounded-xl flex flex-col items-center cursor-pointer transition-all duration-200"
+                  :class="selectedDate === day.fullDate
+                    ? 'bg-[#EAB308] text-black'
+                    : 'text-white/30 hover:text-white/60 hover:bg-white/[0.04]'">
+                  <span class="text-[9px] uppercase tracking-widest mb-0.5 font-medium">{{ day.dayLabel }}</span>
+                  <span class="text-[13px] font-bold">{{ day.dateNumber }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="h-px bg-white/[0.05] mx-5"></div>
+
+            <!-- Time slots + CTA -->
+            <div class="p-5">
+              <div class="grid grid-cols-2 gap-2 mb-5">
+                <button
+                  v-for="sched in availableTimes"
+                  :key="sched.id"
                   @click="selectedScheduleId = sched.id"
-                  class="py-4 rounded-2xl border font-black text-xs transition-all duration-300 uppercase tracking-widest"
-                  :class="selectedScheduleId === sched.id ? 'border-[#EAB308] text-[#EAB308] bg-[#EAB308]/10 shadow-[0_0_15px_rgba(234,179,8,0.1)]' : 'border-white/10 text-gray-400 hover:border-gray-600'">
+                  class="py-3 rounded-xl border text-[11px] font-semibold tracking-widest uppercase transition-all duration-200"
+                  :class="selectedScheduleId === sched.id
+                    ? 'border-[#EAB308] text-[#EAB308] bg-[#EAB308]/[0.07]'
+                    : 'border-white/[0.08] text-white/35 hover:border-white/[0.18] hover:text-white/60'">
                   {{ formatTime(sched.start_time) }}
                 </button>
-             </div>
+              </div>
 
-             <button @click="goToSeats" 
-               :disabled="!selectedScheduleId"
-               class="w-full bg-[#EAB308] text-black py-5 rounded-[22px] font-black text-sm shadow-xl shadow-[#EAB308]/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-20 disabled:cursor-not-allowed uppercase tracking-widest">
-               Select Seats
-             </button>
+              <button
+                @click="goToSeats"
+                :disabled="!selectedScheduleId"
+                class="w-full bg-[#EAB308] text-black py-4 font-bold text-[11px] tracking-[0.18em] uppercase hover:bg-[#d4a007] transition-colors duration-200 disabled:opacity-20 disabled:cursor-not-allowed rounded-xl">
+                Select Seats
+              </button>
+            </div>
+
           </div>
         </div>
+
       </div>
     </div>
   </div>
@@ -123,14 +192,14 @@ const movie = computed(() => data.value?.movies_by_pk)
 
 const availableDates = computed(() => {
   if (!movie.value?.schedules) return []
-  
+
   const daysMap = new Map()
   const dateNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
   movie.value.schedules.forEach((s: any) => {
     const d = new Date(s.start_time)
     const fullDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-    
+
     if (!daysMap.has(fullDate)) {
       daysMap.set(fullDate, {
         dayLabel: dateNames[d.getDay()],
@@ -139,7 +208,7 @@ const availableDates = computed(() => {
       })
     }
   })
-  
+
   return Array.from(daysMap.values()).sort((a, b) => a.fullDate.localeCompare(b.fullDate))
 })
 
@@ -162,11 +231,11 @@ watch(availableDates, (newDates) => {
 
 const formatTime = (timeStr: string) => {
   const d = new Date(timeStr)
-  return d.toLocaleTimeString('en-GB', { 
-    hour: '2-digit', 
-    minute: '2-digit', 
+  return d.toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
     hour12: true,
-    timeZone: 'Africa/Addis_Ababa' 
+    timeZone: 'Africa/Addis_Ababa'
   })
 }
 
@@ -183,4 +252,5 @@ useHead({
 
 <style scoped>
 .no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 </style>

@@ -1,87 +1,207 @@
 <template>
-  <div class="min-h-screen bg-[#090909] text-white py-10 px-4 font-sans overflow-x-hidden">
-    
-    <div v-if="movie" class="max-w-6xl mx-auto mb-12 flex justify-between items-center border-b border-white/5 pb-8">
-      <div class="flex items-center gap-6">
-        <img :src="movie.main_image" class="w-16 h-20 rounded-xl object-cover border border-white/10 shadow-2xl" />
-        <div>
-          <h1 class="text-2xl font-luxury uppercase tracking-tight italic">{{ movie.title }}</h1>
-          <p class="text-gray-500 text-xs mt-1 font-bold tracking-widest uppercase">{{ movie.duration_minutes }} MINUTES • NOW SHOWING</p>
+  <div class="min-h-screen bg-[#090909] text-white font-sans">
+
+    <!-- Sticky movie context bar -->
+    <div class="sticky top-0 z-30 bg-[#090909]/95 backdrop-blur-xl border-b border-white/[0.05]">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-4">
+
+        <!-- Back -->
+        <NuxtLink to="/schedules"
+          class="w-8 h-8 flex items-center justify-center rounded-lg text-white/30 hover:text-white/70 hover:bg-white/[0.05] transition-all flex-shrink-0">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+          </svg>
+        </NuxtLink>
+
+        <!-- Poster -->
+        <img v-if="movie" :src="movie.main_image"
+          class="w-8 h-11 rounded-lg object-cover border border-white/[0.07] flex-shrink-0" />
+
+        <!-- Title + meta -->
+        <div v-if="movie" class="min-w-0 flex-1">
+          <h1 class="font-semibold text-[14px] text-white truncate leading-none mb-0.5">{{ movie.title }}</h1>
+          <p class="text-white/28 text-[10px] font-medium tracking-[0.16em] uppercase">{{ movie.duration_minutes }} min</p>
         </div>
+
+        <!-- Selection count chip -->
+        <div class="ml-auto flex-shrink-0">
+          <div v-if="selectedSeats.length > 0"
+            class="bg-[#EAB308]/[0.10] border border-[#EAB308]/25 text-[#EAB308] text-[10px] font-bold tracking-wider px-3 py-1 rounded-full">
+            {{ selectedSeats.length }} seat{{ selectedSeats.length !== 1 ? 's' : '' }}
+          </div>
+        </div>
+
       </div>
     </div>
 
-    <div class="max-w-fit mx-auto relative mb-20 text-center">
-      <div class="w-[300px] md:w-[700px] h-2 bg-gradient-to-r from-transparent via-[#EAB308] to-transparent rounded-full shadow-[0_15px_40px_rgba(234,179,8,0.4)] mx-auto"></div>
-      <p class="text-[10px] tracking-[1em] text-gray-700 mt-8 font-black uppercase">SCREEN</p>
-    </div>
-    <div class="max-w-fit mx-auto space-y-4">
-      <div v-for="row in rows" :key="row" class="flex items-center gap-6">
-        <span class="text-gray-800 font-black text-sm w-4 text-center">{{ row }}</span>
-        <div class="flex gap-2 md:gap-3">
-          <template v-for="col in 16" :key="col">
-            <div v-if="col === 9" class="w-8 md:w-16"></div>
-            <SeatItem 
-              :label="`${row}${col}`"
-              :type="row === 'A' ? 'vip' : (row === 'B' ? 'couple' : 'standard')"
-              :is-booked="isSeatBooked(row, col)"
-              :is-selected="selectedSeats.includes(`${row}${col}`)"
-              @toggle="toggleSeat(row, col)"
-            />
-          </template>
-        </div>
+    <!-- Screen indicator -->
+    <div class="pt-10 pb-8 text-center">
+      <div class="inline-block w-[min(72vw,560px)]">
+        <div class="w-full h-[2px] bg-gradient-to-r from-transparent via-white/25 to-transparent rounded-full
+                    shadow-[0_4px_22px_rgba(255,255,255,0.08)]"></div>
+        <div class="w-[85%] mx-auto h-[1px] mt-1 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent rounded-full"></div>
+        <p class="text-[8.5px] tracking-[0.55em] text-white/[0.16] mt-3 uppercase font-medium">Screen</p>
       </div>
     </div>
 
-    <div class="flex flex-wrap justify-center gap-10 mt-16 text-[10px] font-black text-gray-500 uppercase tracking-widest">
-      <div class="flex items-center gap-3"><span class="w-4 h-4 bg-white/5 border border-white/10 rounded-sm"></span> Available</div>
-      <div class="flex items-center gap-3 text-white"><span class="w-4 h-4 bg-[#EAB308] rounded-sm"></span> Selected</div>
-      <div class="flex items-center gap-3"><span class="w-4 h-4 bg-red-900/40 rounded-sm"></span> Booked</div>
-    </div>
+    <!-- Seat grid — scrollable on narrow viewports -->
+    <div class="relative">
+      <!-- Gradient fade edges (mobile scroll hint) -->
+      <div class="absolute left-0 top-0 bottom-4 w-6 bg-gradient-to-r from-[#090909] to-transparent z-10 pointer-events-none sm:hidden"></div>
+      <div class="absolute right-0 top-0 bottom-4 w-6 bg-gradient-to-l from-[#090909] to-transparent z-10 pointer-events-none sm:hidden"></div>
 
-    <div class="max-w-5xl mx-auto mt-16 mb-20 px-4">
-      <div class="bg-[#121212] border border-white/5 p-8 rounded-[40px] shadow-2xl flex flex-col md:flex-row justify-between items-center gap-6">
-        <div class="flex gap-10">
-          <div>
-            <p class="text-gray-600 text-[10px] font-black uppercase mb-3 tracking-widest">Your Selection</p>
-            <div class="flex flex-wrap gap-2 max-w-sm">
-              <span v-for="s in selectedSeats" :key="s" class="bg-[#EAB308]/10 text-[#EAB308] px-4 py-1.5 rounded-xl text-xs font-black border border-[#EAB308]/20">
-                {{ s }}
-              </span>
+      <!-- Horizontal scroll wrapper -->
+      <div class="overflow-x-auto seat-scroll px-2">
+        <div class="w-fit mx-auto px-6 sm:px-10 space-y-[7px] pb-2">
+
+          <div v-for="row in rows" :key="row" class="flex items-center gap-3">
+            <!-- Row label -->
+            <span class="text-white/[0.20] font-semibold text-[10px] w-4 text-right flex-shrink-0 tabular-nums">
+              {{ row }}
+            </span>
+
+            <!-- Seats in row -->
+            <div class="flex gap-[5px]">
+              <template v-for="col in 16" :key="col">
+                <!-- Aisle gap between col 8 and 9 -->
+                <div v-if="col === 9" class="w-4 flex-shrink-0"></div>
+                <SeatItem
+                  :label="`${row}${col}`"
+                  :type="getSeatType(row)"
+                  :is-booked="isSeatBooked(row, col)"
+                  :is-selected="selectedSeats.includes(`${row}${col}`)"
+                  @toggle="toggleSeat(row, col)"
+                />
+              </template>
             </div>
           </div>
-          <div class="border-l border-white/10 pl-10">
-            <p class="text-gray-600 text-[10px] font-black uppercase mb-1 tracking-widest">Grand Total</p>
-            <h2 class="text-4xl font-black text-[#EAB308]">{{ totalPrice }} <span class="text-sm font-bold text-gray-500">ETB</span></h2>
-          </div>
+
         </div>
-        
-        <button 
-          @click="handleBooking"
-          :disabled="selectedSeats.length === 0"
-          class="w-full md:w-auto bg-[#EAB308] text-black px-16 py-5 rounded-2xl font-black text-sm hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-[#EAB308]/20 disabled:opacity-20">
-          CONFIRM BOOKING
-        </button>
       </div>
     </div>
+
+    <!-- Legend -->
+    <div class="max-w-xl mx-auto px-6 mt-10 mb-4">
+
+      <!-- Status legend -->
+      <div class="flex items-center justify-center gap-6 sm:gap-8 flex-wrap mb-5">
+        <!-- Available -->
+        <div class="flex items-center gap-2">
+          <div class="w-[18px] h-[17px] bg-white/[0.07] border border-white/[0.12]" style="border-radius: 4px 4px 2px 2px"></div>
+          <span class="text-[10px] text-white/35 font-medium">Available</span>
+        </div>
+        <!-- Selected -->
+        <div class="flex items-center gap-2">
+          <div class="w-[18px] h-[17px] bg-white border border-white shadow-[0_0_8px_rgba(255,255,255,0.3)]" style="border-radius: 4px 4px 2px 2px"></div>
+          <span class="text-[10px] text-white/35 font-medium">Selected</span>
+        </div>
+        <!-- Taken -->
+        <div class="flex items-center gap-2">
+          <div class="w-[18px] h-[17px] bg-white/[0.04] border border-white/[0.05]" style="border-radius: 4px 4px 2px 2px"></div>
+          <span class="text-[10px] text-white/35 font-medium">Taken</span>
+        </div>
+      </div>
+
+      <!-- Seat type + price legend -->
+      <div class="flex items-center justify-center gap-5 sm:gap-7 flex-wrap border-t border-white/[0.05] pt-4">
+
+        <!-- Standard -->
+        <div class="flex items-center gap-2.5">
+          <div class="w-[18px] h-[17px] bg-white/[0.07] border border-white/[0.12]" style="border-radius: 4px 4px 2px 2px"></div>
+          <div>
+            <p class="text-[10px] text-white/45 font-semibold leading-none">Standard</p>
+            <p class="text-[9px] text-white/22 mt-0.5">{{ (priceMap['standard'] ?? 0).toLocaleString() }} ETB</p>
+          </div>
+        </div>
+
+        <!-- VIP -->
+        <div class="flex items-center gap-2.5">
+          <div class="w-[18px] h-[17px] bg-[#EAB308]/[0.09] border border-[#EAB308]/30 flex items-center justify-center" style="border-radius: 4px 4px 2px 2px">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="rgba(234,179,8,0.7)">
+              <path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5ZM19 19C19 19.5523 18.5523 20 18 20H6C5.44772 20 5 19.5523 5 19V18H19V19Z"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-[10px] text-[#EAB308]/70 font-semibold leading-none">VIP</p>
+            <p class="text-[9px] text-white/22 mt-0.5">{{ (priceMap['vip'] ?? 0).toLocaleString() }} ETB</p>
+          </div>
+        </div>
+
+        <!-- Couple -->
+        <div class="flex items-center gap-2.5">
+          <div class="w-[18px] h-[17px] bg-rose-500/[0.09] border border-rose-500/30 flex items-center justify-center" style="border-radius: 4px 4px 2px 2px">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="rgba(244,63,94,0.7)">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 2 7.5 2c1.74 0 3.41.81 4.5 2.09C13.09 2.81 14.76 2 16.5 2 19.58 2 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-[10px] text-rose-400/70 font-semibold leading-none">Couple</p>
+            <p class="text-[9px] text-white/22 mt-0.5">{{ (priceMap['couple'] ?? 0).toLocaleString() }} ETB</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Footer spacer -->
+    <div class="h-36 sm:h-28"></div>
+
+    <!-- Sticky booking footer -->
+    <div class="fixed bottom-0 left-0 right-0 z-50 bg-[#090909]/95 backdrop-blur-xl border-t border-white/[0.06]">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+
+        <!-- Selected seats + total price -->
+        <div class="flex items-start gap-6">
+          <div class="flex-1 min-w-0">
+            <p class="text-[9px] font-semibold tracking-[0.26em] text-white/25 uppercase mb-1.5">Selected Seats</p>
+            <div class="flex flex-wrap gap-1.5 max-w-[230px] sm:max-w-xs">
+              <span v-for="s in selectedSeats" :key="s"
+                class="bg-[#EAB308]/[0.08] border border-[#EAB308]/20 text-[#EAB308] px-2 py-0.5 rounded text-[10px] font-semibold">
+                {{ s }}
+              </span>
+              <span v-if="selectedSeats.length === 0" class="text-white/15 text-[11px]">None selected</span>
+            </div>
+          </div>
+
+          <div class="border-l border-white/[0.07] pl-6 flex-shrink-0">
+            <p class="text-[9px] font-semibold tracking-[0.26em] text-white/25 uppercase mb-1">Total</p>
+            <p class="text-[22px] font-bold text-white leading-none">
+              {{ totalPrice.toLocaleString() }}<span class="text-[11px] font-medium text-white/30 ml-1">ETB</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Confirm button -->
+        <button
+          @click="handleBooking"
+          :disabled="selectedSeats.length === 0"
+          class="w-full sm:w-auto flex-shrink-0 bg-[#EAB308] text-black px-9 py-3.5 rounded-xl font-bold text-[11px] tracking-[0.18em] uppercase hover:bg-[#d4a007] active:scale-[0.98] transition-all duration-200 disabled:opacity-20 disabled:cursor-not-allowed">
+          Confirm Booking
+        </button>
+
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script setup lang="ts">
-import { GET_SCHEDULE_SEATS, GET_BOOKED_SEATS } from '~/graphql/movies'
+import { GET_SCHEDULE_SEATS, GET_BOOKED_SEATS, GET_SEAT_PRICES } from '~/graphql/movies'
 
 const route = useRoute()
-const scheduleId = route.query.schedule_id 
+const scheduleId = route.query.schedule_id
 const { saveBooking } = useBookingStore()
 const authCookie = useCookie('auth_token')
 
-const { data: scheduleData, pending } = await useAsyncQuery<any>(GET_SCHEDULE_SEATS, { 
-  schedule_id: scheduleId 
+const { data: scheduleData, pending } = await useAsyncQuery<any>(GET_SCHEDULE_SEATS, {
+  schedule_id: scheduleId
 })
 
-const { data: bookedData } = await useAsyncQuery<any>(GET_BOOKED_SEATS, { 
-  schedule_id: scheduleId 
+const { data: bookedData } = await useAsyncQuery<any>(GET_BOOKED_SEATS, {
+  schedule_id: scheduleId
 })
+
+const { data: seatPricesData } = await useAsyncQuery<any>(GET_SEAT_PRICES)
 
 const movie = computed(() => scheduleData.value?.schedules_by_pk?.movie)
 
@@ -93,7 +213,16 @@ const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 const selectedSeats = ref<string[]>([])
 
 const getSeatType = (row: string) => row === 'A' ? 'vip' : (row === 'B' ? 'couple' : 'standard')
-const getPrice = (row: string) => row === 'A' ? 1200 : (row === 'B' ? 800 : 400)
+
+// Build a type→price map entirely from the database 
+const priceMap = computed<Record<string, number>>(() => {
+  const map: Record<string, number> = {}
+  const entries: { type: string; price: number }[] = seatPricesData.value?.seat_prices ?? []
+  entries.forEach(p => { map[p.type] = Number(p.price) })
+  return map
+})
+
+const getPrice = (row: string) => priceMap.value[getSeatType(row)] ?? 0
 
 const toggleSeat = (row: string, col: number) => {
   const id = `${row}${col}`
@@ -128,12 +257,18 @@ const handleBooking = async () => {
       title: movie.value.title,
       main_image: movie.value.main_image,
       id: movie.value.id,
-      schedule_id: scheduleId 
+      schedule_id: scheduleId
     };
-    
+
     console.log("Saving data to storage:", cleanMovieData);
     saveBooking(cleanMovieData, selectedSeats.value, totalPrice.value);
     await navigateTo('/booking/summary');
   }
 }
 </script>
+
+<style scoped>
+/* Hide scrollbar while keeping scroll functionality */
+.seat-scroll::-webkit-scrollbar { display: none; }
+.seat-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+</style>

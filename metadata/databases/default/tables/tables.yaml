@@ -10,6 +10,7 @@
 - "!include public_movies.yaml"
 - "!include public_ratings.yaml"
 - "!include public_schedules.yaml"
+- "!include public_seat_prices.yaml"
 - "!include public_seats.yaml"
 - "!include public_stars.yaml"
 - "!include public_users.yaml"

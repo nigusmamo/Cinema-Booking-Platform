@@ -1,70 +1,113 @@
 <template>
-  <div class="max-w-7xl mx-auto">
-    
-    <!-- Header -->
-    <div class="flex items-center justify-between mb-10">
+  <div class="pb-16">
+
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
       <div>
-        <h1 class="text-4xl font-luxury uppercase italic tracking-tighter mb-2">Manage <span class="text-[#EAB308]">Schedules .</span></h1>
-        <p class="text-gray-500 text-sm font-bold uppercase tracking-widest">Total: {{ schedules.length }} Schedules</p>
+        <p class="text-[10px] font-semibold tracking-[0.3em] text-white/25 uppercase mb-1">Programming</p>
+        <h1 class="text-[22px] font-semibold text-white tracking-tight leading-none mb-1">Schedules</h1>
+        <p class="text-[12px] text-white/30">{{ schedules.length }} total schedules</p>
       </div>
 
-      <button @click="openModal()" class="bg-[#EAB308] text-black px-8 py-3 rounded-xl font-black text-xs hover:scale-105 transition shadow-lg text-center flex items-center justify-center">
-        + ADD SCHEDULE
+      <button
+        @click="openModal()"
+        class="inline-flex items-center gap-2 bg-[#EAB308] text-black px-5 py-2.5 rounded-lg text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#d4a007] active:scale-[0.98] transition-all self-start sm:self-auto"
+      >
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Add Schedule
       </button>
     </div>
 
+    <!-- Loading -->
     <div v-if="pending" class="flex justify-center py-20">
-      <span class="w-10 h-10 border-4 border-[#EAB308]/30 border-t-[#EAB308] rounded-full animate-spin"></span>
+      <span class="w-8 h-8 border-2 border-[#EAB308]/20 border-t-[#EAB308] rounded-full animate-spin"></span>
     </div>
 
-    <div v-else-if="schedules.length === 0" class="text-center py-20 bg-[#0D0D0D] border border-white/5 rounded-[35px]">
-      <p class="text-gray-500 font-bold uppercase tracking-widest">No schedules found.</p>
+    <!-- Empty State -->
+    <div v-else-if="schedules.length === 0" class="py-20 flex flex-col items-center justify-center gap-3">
+      <div class="w-12 h-12 rounded-2xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-white/20">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+      </div>
+      <p class="text-[12px] text-white/25 font-medium">No schedules found</p>
     </div>
 
-    <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-20">
-      <div v-for="schedule in schedules" :key="schedule.id" class="bg-[#0D0D0D] border border-white/5 rounded-[35px] p-6 flex gap-6 hover:border-white/20 transition group shadow-2xl relative">
-        
-        <div class="w-20 h-28 rounded-2xl overflow-hidden flex-shrink-0 bg-black">
-          <img :src="schedule.movie.main_image" class="w-full h-full object-cover">
+    <!-- Schedule List -->
+    <div v-else class="bg-[#0D0D0D] border border-white/[0.06] rounded-2xl overflow-hidden">
+      <!-- Column Headers -->
+      <div class="px-6 py-3 border-b border-white/[0.05] hidden md:grid md:grid-cols-[80px_1fr_140px_100px_80px] gap-4 text-[10px] font-semibold tracking-[0.2em] uppercase text-white/25">
+        <span>Poster</span>
+        <span>Film</span>
+        <span>Date &amp; Time</span>
+        <span>Duration</span>
+        <span>Actions</span>
+      </div>
+
+      <!-- Rows -->
+      <div
+        v-for="schedule in schedules"
+        :key="schedule.id"
+        class="grid grid-cols-[56px_1fr_auto] md:grid-cols-[80px_1fr_140px_100px_80px] gap-4 items-center px-6 py-4 border-b border-white/[0.04] last:border-b-0 hover:bg-white/[0.02] transition-colors"
+      >
+        <!-- Poster -->
+        <div class="w-10 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-white/[0.04]">
+          <img :src="schedule.movie.main_image" class="w-full h-full object-cover" />
         </div>
-        
-        <div class="flex-1 flex flex-col justify-center">
-          <h3 class="text-xl font-black uppercase line-clamp-1 mb-2">{{ schedule.movie.title }}</h3>
-          
-          <div class="grid grid-cols-2 gap-y-2 gap-x-4 mb-4">
-            <div>
-              <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Date & Time</p>
-              <p class="text-sm font-bold text-white">{{ formatDate(schedule.start_time) }}</p>
-            </div>
-            <div>
-              <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Duration</p>
-              <p class="text-sm font-bold text-white">{{ schedule.movie.duration_minutes }} Min</p>
-            </div>
-          </div>
 
-          <div class="flex gap-2">
-            <button @click="openModal(schedule)" class="bg-white/5 hover:bg-white/10 text-white p-2 rounded-xl transition flex items-center justify-center">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-            </button>
-            <button @click="confirmDelete(schedule.id)" class="bg-red-500/10 hover:bg-red-500/20 text-red-500 p-2 rounded-xl transition">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-            </button>
-          </div>
+        <!-- Title -->
+        <div class="min-w-0">
+          <p class="text-[13px] font-semibold text-white line-clamp-1">{{ schedule.movie.title }}</p>
+          <p class="text-[11px] text-white/30 mt-0.5 md:hidden">{{ formatDate(schedule.start_time) }}</p>
+        </div>
+
+        <!-- Date & Time -->
+        <p class="text-[12px] text-white/45 hidden md:block">{{ formatDate(schedule.start_time) }}</p>
+
+        <!-- Duration -->
+        <p class="text-[12px] text-white/45 hidden md:block">{{ schedule.movie.duration_minutes }} min</p>
+
+        <!-- Actions -->
+        <div class="flex items-center gap-1.5">
+          <button
+            @click="openModal(schedule)"
+            class="w-7 h-7 flex items-center justify-center rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-white/40 hover:text-white/80 transition-all"
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+          </button>
+          <button
+            @click="confirmDelete(schedule.id)"
+            class="w-7 h-7 flex items-center justify-center rounded-lg bg-red-500/[0.06] hover:bg-red-500/[0.14] text-red-500/50 hover:text-red-400 transition-all"
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          </button>
         </div>
       </div>
     </div>
 
     <!-- Modal for Create/Edit -->
     <AdminModal v-if="showModal" :title="editId ? 'Edit Schedule' : 'Add Schedule'" @close="closeModal" max-width="max-w-md">
-      <form @submit.prevent="handleSubmit" class="space-y-6">
-        
-        <div v-if="errorMessage" class="bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-xl text-sm font-bold">
+      <form @submit.prevent="handleSubmit" class="space-y-5">
+
+        <div v-if="errorMessage" class="bg-red-500/[0.07] border border-red-500/[0.15] text-red-400 px-4 py-3 rounded-xl text-[12px]">
           {{ errorMessage }}
         </div>
 
         <div>
-          <label class="block text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2">Movie</label>
-          <select v-model="form.movie_id" required class="w-full bg-black border border-white/10 px-4 py-4 rounded-2xl focus:outline-none focus:border-[#EAB308] text-white transition">
+          <label class="block text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35 mb-2">Movie</label>
+          <select v-model="form.movie_id" required class="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#EAB308]/50 transition-all appearance-none cursor-pointer">
             <option value="" disabled>Select Movie</option>
             <option v-for="m in formData?.movies" :key="m.id" :value="m.id">{{ m.title }}</option>
           </select>
@@ -72,27 +115,29 @@
 
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2">Start Time</label>
-            <input v-model="form.start_time" type="datetime-local" required class="w-full bg-black border border-white/10 px-4 py-4 rounded-2xl focus:outline-none focus:border-[#EAB308] text-white transition" style="color-scheme: dark;">
+            <label class="block text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35 mb-2">Start Time</label>
+            <input v-model="form.start_time" type="datetime-local" required class="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#EAB308]/50 transition-all" style="color-scheme: dark;">
           </div>
           <div>
-            <label class="block text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2">End Time</label>
-            <input v-model="form.end_time" type="datetime-local" required class="w-full bg-black border border-white/10 px-4 py-4 rounded-2xl focus:outline-none focus:border-[#EAB308] text-white transition" style="color-scheme: dark;">
+            <label class="block text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35 mb-2">End Time</label>
+            <input v-model="form.end_time" type="datetime-local" required class="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#EAB308]/50 transition-all" style="color-scheme: dark;">
           </div>
         </div>
 
-        <div class="pt-4 flex justify-end">
-          <button type="submit" class="bg-[#EAB308] text-black px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition shadow-xl w-full flex items-center justify-center" :disabled="isSubmitting">
-            <span v-if="isSubmitting" class="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>
-            <span v-else>{{ editId ? 'Update' : 'Save' }} Schedule</span>
-          </button>
-        </div>
+        <button
+          type="submit"
+          class="w-full inline-flex items-center justify-center gap-2 bg-[#EAB308] text-black py-2.5 rounded-lg text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#d4a007] active:scale-[0.98] transition-all mt-2"
+          :disabled="isSubmitting"
+        >
+          <span v-if="isSubmitting" class="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>
+          <span v-else>{{ editId ? 'Update' : 'Save' }} Schedule</span>
+        </button>
       </form>
     </AdminModal>
 
     <!-- Delete Confirmation Modal -->
-    <AdminDeleteConfirm 
-      v-if="showDeleteConfirm" 
+    <AdminDeleteConfirm
+      v-if="showDeleteConfirm"
       :is-deleting="isDeleting"
       title="Delete Schedule"
       message="Are you sure you want to delete this schedule? This will also delete any related bookings."
@@ -104,12 +149,12 @@
 
 <script setup lang="ts">
 definePageMeta({ layout: 'admin' })
-import { 
-  GET_ADMIN_SCHEDULES, 
-  GET_ADMIN_FORM_DATA, 
-  INSERT_SCHEDULE, 
-  UPDATE_SCHEDULE, 
-  DELETE_SCHEDULE 
+import {
+  GET_ADMIN_SCHEDULES,
+  GET_ADMIN_FORM_DATA,
+  INSERT_SCHEDULE,
+  UPDATE_SCHEDULE,
+  DELETE_SCHEDULE
 } from '~/graphql/admin'
 
 const { data, pending, refresh } = await useAsyncQuery<any>(GET_ADMIN_SCHEDULES)
@@ -155,7 +200,7 @@ const closeModal = () => {
 const handleSubmit = async () => {
   errorMessage.value = ''
   isSubmitting.value = true
-  
+
   try {
     const client = resolveClient()
     const headers = { Authorization: `Bearer ${authCookie.value}` }
@@ -203,7 +248,7 @@ const confirmDelete = (id: string) => {
 const executeDelete = async () => {
   if (!scheduleToDelete.value) return
   isDeleting.value = true
-  
+
   try {
     const client = resolveClient()
     await client.mutate({

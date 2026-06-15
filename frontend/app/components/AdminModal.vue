@@ -1,18 +1,21 @@
 <template>
-  <div class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
-    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" @click="$emit('close')"></div>
-    <div class="relative bg-[#0D0D0D] border border-white/10 rounded-[35px] shadow-2xl w-full max-h-[90vh] flex flex-col" :class="maxWidthClass">
-      
+  <div class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/75 backdrop-blur-md" @click="$emit('close')"></div>
+    <div class="relative bg-[#0E0E0E] border border-white/[0.08] rounded-2xl shadow-2xl w-full max-h-[90vh] flex flex-col" :class="maxWidthClass">
+
       <!-- Header -->
-      <div class="p-6 md:p-8 border-b border-white/5 flex items-center justify-between flex-shrink-0">
-        <h2 class="text-2xl font-black uppercase italic tracking-tighter">{{ title }}</h2>
-        <button @click="$emit('close')" class="text-gray-500 hover:text-white transition bg-white/5 p-2 rounded-full">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      <div class="px-6 py-5 border-b border-white/[0.05] flex items-center justify-between flex-shrink-0">
+        <h2 class="text-[13px] font-semibold tracking-wide text-white">{{ title }}</h2>
+        <button @click="$emit('close')" class="w-7 h-7 flex items-center justify-center rounded-lg text-white/30 hover:text-white/70 hover:bg-white/[0.06] transition-all">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
         </button>
       </div>
 
       <!-- Body -->
-      <div class="p-6 md:p-8 overflow-y-auto flex-1 custom-scrollbar">
+      <div class="p-6 overflow-y-auto flex-1 custom-scrollbar">
         <slot />
       </div>
 
@@ -41,17 +44,17 @@ const maxWidthClass = computed(() => {
 
 <style scoped>
 .custom-scrollbar::-webkit-scrollbar {
-  width: 8px;
+  width: 4px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.02);
   border-radius: 10px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 10px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(234, 179, 8, 0.5);
+  background: rgba(234, 179, 8, 0.4);
 }
 </style>

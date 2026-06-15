@@ -1,110 +1,234 @@
 <template>
-  <div class="bg-[#0D0D0D] min-h-screen font-sans text-white">
+  <div class="bg-[#090909] min-h-screen font-sans text-white">
 
-    <section class="relative h-[85vh] flex items-center px-6 md:px-20 overflow-hidden">
-      
-      <img 
-        v-if="allMovies && allMovies.length > 0" 
-        :src="allMovies[0]?.main_image" 
+    <!-- ══════════════════════════════════════════════════════
+         HERO — cinematic full-height with fan poster cards
+    ══════════════════════════════════════════════════════ -->
+    <section ref="heroSection" class="relative h-[90vh] min-h-[620px] flex items-center overflow-hidden">
+
+      <!-- Background: Ken Burns slow zoom for depth -->
+      <img
+        v-if="allMovies.length > 0"
+        :src="allMovies[0]?.main_image"
         referrerpolicy="no-referrer"
-        class="absolute inset-0 w-full h-full object-cover opacity-20 blur-[1px]" 
+        class="hero-bg absolute inset-0 w-full h-full object-cover"
+        style="opacity: 0.15; transform-origin: center center"
       />
-      
-      <div class="absolute inset-0 bg-gradient-to-r from-black via-black/60 to-transparent"></div>
-      <div class="absolute inset-0 bg-gradient-to-t from-[#0D0D0D] via-transparent to-transparent"></div>
-      
-      <div class="relative z-10 max-w-2xl">
-        <h1 class="text-7xl md:text-8xl font-modern-luxury font-medium mb-6 leading-[0.85] tracking-tighter text-white uppercase">
-          Experience <br/> 
-          <span class="text-gray-500 whitespace-nowrap">Cinema Beyond</span> <br/>
-          <span class="text-[#EAB308]">Reality</span>
-        </h1>
-        <p class="text-gray-400 text-lg mb-10 max-w-md font-medium">
-          Discover new worlds on the big screen. Feel it in premium quality at Ethiopian Cinema House.
-        </p>
 
-        <button 
-          v-if="allMovies.length > 0 && !isAdmin"
-          @click="navigateTo(`/schedules`)" 
-          class="bg-[#EAB308] text-black px-12 py-4 rounded-xl font-black hover:scale-105 transition-all shadow-[0_0_30px_rgba(234,179,8,0.3)]">
-          BOOK TICKETS
-        </button>
-      </div>
-      
-      <div class="hidden lg:flex absolute right-[-5%] top-1/2 -translate-y-1/2 gap-0 items-center scale-90">
-        <div v-for="(m, index) in allMovies.slice(0, 3)" :key="m.id" 
-          class="w-72 h-[480px] rounded-[35px] overflow-hidden border-[6px] border-white/5 shadow-2xl transition-all duration-700"
-          :class="[
-            index === 0 ? 'rotate-[-12deg] z-10 translate-x-24' : '',
-            index === 1 ? 'rotate-0 z-30 scale-110 -translate-y-5 shadow-[0_0_60px_rgba(0,0,0,0.8)]' : '',
-            index === 2 ? 'rotate-[12deg] z-20 -translate-x-24 translate-y-5' : ''
-          ]">
-          <img :src="m.main_image" referrerpolicy="no-referrer" class="w-full h-full object-cover" />
+      <!-- Gradient stack -->
+      <div class="absolute inset-0 bg-gradient-to-r from-[#090909] via-[#090909]/88 to-[#090909]/15"></div>
+      <div class="absolute inset-0 bg-gradient-to-t from-[#090909] via-[#090909]/10 to-[#090909]/50"></div>
+      <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#090909]"></div>
+
+      <!-- Content: two-column grid — text left, cards right -->
+      <div class="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-14">
+        <div class="lg:grid lg:grid-cols-[460px_1fr] items-center">
+
+          <!-- Left: headline + CTA -->
+          <div>
+
+            <!-- Eyebrow -->
+            <div class="flex items-center gap-3 mb-6">
+              <span class="block w-8 h-px bg-[#C49208]/50"></span>
+              <span class="text-[8.5px] font-semibold tracking-[0.46em] uppercase text-[#C49208]/55 whitespace-nowrap">
+                Ethiopian Cinema House
+              </span>
+              <span class="block w-5 h-px bg-[#C49208]/18"></span>
+            </div>
+
+            <!-- Headline: three lines, distinct weight/style contrast -->
+            <h1 class="font-modern-luxury mb-8" style="line-height: 0.88">
+              <span
+                class="block font-light italic text-white/80"
+                style="font-size: clamp(50px, 5.4vw, 76px); letter-spacing: -0.015em"
+              >
+                Experience
+              </span>
+              <span
+                class="block font-light text-white/[0.14]"
+                style="font-size: clamp(50px, 5.4vw, 76px); letter-spacing: -0.015em"
+              >
+                Cinema Beyond
+              </span>
+              <span
+                class="block font-bold italic hero-gold-glow"
+                style="font-size: clamp(68px, 7.5vw, 104px); color: #C49208; letter-spacing: -0.03em; margin-top: 0.06em"
+              >
+                Reality.
+              </span>
+            </h1>
+
+            <!-- Description -->
+            <p class="text-white/[0.28] text-[13px] font-light leading-[1.8] mb-9 max-w-[270px]">
+              Discover new worlds on the big screen. Premium quality at Ethiopian Cinema House.
+            </p>
+
+            <!-- CTA -->
+            <button
+              v-if="allMovies.length > 0 && !isAdmin"
+              @click="navigateTo(`/schedules`)"
+              class="hero-cta inline-flex items-center gap-3 bg-[#C49208] text-black px-9 py-3.5 text-[11px] font-bold tracking-[0.18em] uppercase hover:bg-[#AE8207] active:scale-[0.97] transition-all duration-200"
+            >
+              Book Tickets
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Right: fan of 3 poster cards — absolute within a fixed-height box -->
+          <div class="hidden lg:flex items-center justify-center relative h-[560px]">
+            <div
+              v-for="(m, index) in allMovies.slice(0, 3)"
+              :key="m.id"
+              class="absolute"
+              :style="{
+                zIndex: [10, 30, 20][index],
+                transform: [
+                  'rotate(-7deg) translateX(-198px) scale(0.93)',
+                  'scale(1.04)',
+                  'rotate(7deg) translateX(198px) translateY(8px) scale(0.93)'
+                ][index]
+              }"
+            >
+              <!-- Float wrapper -->
+              <div
+                :style="{
+                  animation: `${index === 1 ? 'heroFloatCenter' : 'heroFloat'} ${[6.4, 5.6, 6.1][index]}s ease-in-out infinite`,
+                  animationDelay: `${[0, 0.85, 1.75][index]}s`,
+                  willChange: 'transform'
+                }"
+              >
+                <div
+                  class="w-[305px] h-[458px] rounded-2xl overflow-hidden group cursor-pointer"
+                  :class="index !== 1 ? 'hero-side-card' : 'hero-center-card'"
+                >
+                  <img
+                    :src="m.main_image"
+                    referrerpolicy="no-referrer"
+                    class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.07]"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
 
-    <div class="max-w-7xl mx-auto px-4 -mt-20 relative z-20">
-      <div class="bg-[#121212]/95 backdrop-blur-xl border border-white/5 p-8 rounded-[40px] shadow-2xl">
-        
-        <div class="flex gap-4 overflow-x-auto py-8 px-6 no-scrollbar">
-          <div v-for="day in dynamicDays" :key="day.fullDate"
-            @click="selectedDate = day.fullDate" 
-            class="flex-shrink-0 w-20 py-4 rounded-[22px] border border-white/5 flex flex-col items-center cursor-pointer transition-all duration-500"
-            :class="selectedDate === day.fullDate ? 'bg-gradient-to-b from-[#EAB308] to-[#B48906] text-black font-bold shadow-[0_10px_25px_rgba(234,179,8,0.4)] scale-110' : 'bg-white/5 text-gray-500 hover:bg-white/10'">
-            <span class="text-[9px] uppercase tracking-widest mb-1 opacity-70">{{ day.label }}</span>
-            <span class="text-lg font-black">{{ day.dateNumber }}</span>
-          </div>
-        </div>
+    <div class="sticky top-14 z-30 bg-[#090909] border-b border-white/[0.06]">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="flex items-center overflow-x-auto no-scrollbar" style="height:54px; gap:0">
 
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mt-2">
-          <div class="relative">
-            <select v-model="selectedGenre" class="appearance-none w-full bg-white/5 border border-white/10 text-sm px-6 py-4 rounded-[20px] focus:outline-none focus:border-[#EAB308] text-white cursor-pointer transition">
-              <option value="" class="bg-[#121212]">All Genres</option>
-              <option v-for="g in genres" :key="g.id" :value="g.name" class="bg-[#121212]">{{ g.name }}</option>
+          <!-- Date pills -->
+          <div class="flex items-center gap-[3px] flex-shrink-0 pr-4">
+            <button
+              v-for="day in dynamicDays"
+              :key="day.fullDate"
+              @click="selectedDate = day.fullDate"
+              class="flex-shrink-0 flex flex-col items-center justify-center w-[48px] h-9 rounded-lg transition-all duration-150"
+              :class="selectedDate === day.fullDate
+                ? 'bg-[#EAB308] text-black'
+                : 'text-white/30 hover:text-white/65 hover:bg-white/[0.05]'"
+            >
+              <span class="text-[8px] uppercase tracking-widest font-semibold leading-none mb-[3px]">{{ day.label }}</span>
+              <span class="text-[12px] font-bold leading-none">{{ day.dateNumber }}</span>
+            </button>
+          </div>
+
+          <div class="w-px h-[18px] bg-white/[0.08] flex-shrink-0"></div>
+
+          <!-- Genre -->
+          <div class="relative flex-shrink-0 px-4">
+            <select
+              v-model="selectedGenre"
+              class="appearance-none bg-transparent text-[12px] text-white/38 hover:text-white/70 focus:text-white/70 pr-4 cursor-pointer focus:outline-none transition-colors"
+            >
+              <option value="" class="bg-[#0D0D0D]">All Genres</option>
+              <option v-for="g in genres" :key="g.id" :value="g.name" class="bg-[#0D0D0D]">{{ g.name }}</option>
             </select>
-            <span class="absolute right-5 top-1/2 -translate-y-1/2 text-[10px] text-[#EAB308] pointer-events-none">▼</span>
+            <svg class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-white/20" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
           </div>
 
-          <div class="relative">
-            <select v-model="selectedDirector" class="appearance-none w-full bg-white/5 border border-white/10 text-sm px-6 py-4 rounded-[20px] focus:outline-none focus:border-[#EAB308] text-white cursor-pointer transition">
-              <option value="" class="bg-[#121212]">All Directors</option>
-              <option v-for="d in directors" :key="d.id" :value="d.name" class="bg-[#121212]">{{ d.name }}</option>
+          <div class="w-px h-[18px] bg-white/[0.06] flex-shrink-0"></div>
+
+          <!-- Director -->
+          <div class="relative flex-shrink-0 px-4">
+            <select
+              v-model="selectedDirector"
+              class="appearance-none bg-transparent text-[12px] text-white/38 hover:text-white/70 focus:text-white/70 pr-4 cursor-pointer focus:outline-none transition-colors"
+            >
+              <option value="" class="bg-[#0D0D0D]">All Directors</option>
+              <option v-for="d in directors" :key="d.id" :value="d.name" class="bg-[#0D0D0D]">{{ d.name }}</option>
             </select>
-            <span class="absolute right-5 top-1/2 -translate-y-1/2 text-[10px] text-[#EAB308] pointer-events-none">▼</span>
+            <svg class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-white/20" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
           </div>
 
-          <div class="md:col-span-2 relative">
-            <input v-model="searchQuery" type="text" placeholder="Search by title or director..." 
-              class="w-full bg-white/5 border border-white/10 pl-14 pr-6 py-4 rounded-[20px] focus:outline-none focus:border-[#EAB308] text-white transition placeholder:text-gray-600" />
-            <span class="absolute left-6 top-1/2 -translate-y-1/2 text-gray-500 text-xl">🔍</span>
+          <div class="w-px h-[18px] bg-white/[0.06] flex-shrink-0"></div>
+
+          <!-- Search -->
+          <div class="relative flex-1 min-w-[130px] pl-4 pr-2">
+            <svg class="absolute left-4 top-1/2 -translate-y-1/2 text-white/[0.16]" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Search films…"
+              class="w-full bg-transparent pl-5 text-[12px] text-white/50 placeholder:text-white/[0.18] focus:outline-none focus:text-white/70 transition-colors"
+            />
           </div>
+
         </div>
       </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-6 py-24">
-      <h2 class="text-3xl font-luxury uppercase italic mb-16 tracking-tighter">NOW SHOWING <span class="text-[#EAB308]">.</span></h2>
-      
-      <div v-if="pending" class="grid grid-cols-2 md:grid-cols-4 gap-12">
-        <div v-for="i in 4" :key="i" class="aspect-[4/5] bg-white/5 animate-pulse rounded-[32px]"></div>
+    <!-- NOW SHOWING — movie grid -->
+    <div class="max-w-7xl mx-auto px-6 pt-6 pb-24">
+
+      <!-- Section label + count -->
+      <div class="flex items-center gap-4 mb-5">
+        <span class="text-[10px] font-semibold tracking-[0.28em] text-white/25 uppercase flex-shrink-0">Now Showing</span>
+        <div class="h-px flex-1 bg-white/[0.05]"></div>
+        <span v-if="!pending" class="text-[10px] text-white/20 flex-shrink-0">
+          {{ filteredMovies.length }} {{ filteredMovies.length === 1 ? 'film' : 'films' }}
+        </span>
       </div>
 
-      <div v-else class="grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-16">
-        <MovieCard 
-            v-for="movie in filteredMovies" 
-            :key="movie.id"
-            :title="movie.title"
-            :image="movie.main_image"
-            :duration="movie.duration_minutes"
-            :rating="movie.rating_avg"
-            @click="navigateTo(`/movies/${movie.id}`)" 
+      <!-- Skeleton loader -->
+      <div v-if="pending" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+        <div v-for="i in 10" :key="i" class="aspect-[2/3] bg-white/[0.03] animate-pulse rounded-xl"></div>
+      </div>
+
+      <!-- Movie grid -->
+      <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+        <MovieCard
+          v-for="movie in filteredMovies"
+          :key="movie.id"
+          :title="movie.title"
+          :image="movie.main_image"
+          :duration="movie.duration_minutes"
+          :rating="movie.rating_avg"
+          @click="navigateTo(`/movies/${movie.id}`)"
         />
       </div>
 
-      <div v-if="!pending && filteredMovies.length === 0" class="text-center py-20 text-gray-500 italic font-medium">
-        No movies found matching your filters for this date.
+      <!-- Empty state -->
+      <div v-if="!pending && filteredMovies.length === 0" class="text-center py-20">
+        <div class="w-12 h-12 border border-white/[0.07] rounded-xl flex items-center justify-center mx-auto mb-4">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-white/15">
+            <rect x="2" y="7" width="20" height="15" rx="2"/>
+            <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+          </svg>
+        </div>
+        <p class="text-white/18 text-[11px] font-medium tracking-[0.24em] uppercase">No films scheduled for this date</p>
       </div>
+
     </div>
   </div>
 </template>
@@ -115,17 +239,45 @@ import { GET_HOME_PAGE_DATA } from '~/graphql/movies'
 const { data, pending } = await useAsyncQuery<any>(GET_HOME_PAGE_DATA)
 const { isAdmin } = useAuth()
 
+const heroSection = ref<HTMLElement | null>(null)
+let heroObserver: IntersectionObserver | null = null
+
 onMounted(() => {
   if (isAdmin.value) {
     navigateTo('/admin/movies')
   }
+
+  const section = heroSection.value
+  if (!section || typeof IntersectionObserver === 'undefined') return
+
+  nextTick(() => {
+    const animatedEls = [
+      section.querySelector('.hero-bg'),
+      ...Array.from(section.querySelectorAll('.hero-center-card, .hero-side-card')),
+      ...Array.from(section.querySelectorAll('[style*="animation"]'))
+    ].filter((el): el is HTMLElement => el instanceof HTMLElement)
+
+    heroObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry) return
+        const state = entry.isIntersecting ? '' : 'paused'
+        animatedEls.forEach(el => { el.style.animationPlayState = state })
+      },
+      { threshold: 0 }
+    )
+    heroObserver.observe(section)
+  })
+})
+
+onUnmounted(() => {
+  heroObserver?.disconnect()
 })
 
 const dynamicDays = computed(() => {
   const daysArray = []
   const dateNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
   const today = new Date()
-  
+
   for (let i = 0; i < 7; i++) {
     const d = new Date()
     d.setDate(today.getDate() + i)
@@ -144,7 +296,7 @@ const selectedGenre = ref('')
 const selectedDirector = ref('')
 const searchQuery = ref('')
 
-const allMovies = computed(() => data.value?.movies ?? [])
+const allMovies = computed((): any[] => data.value?.movies ?? [])
 const genres = computed(() => data.value?.genres ?? [])
 const directors = computed(() => data.value?.directors ?? [])
 
@@ -153,14 +305,14 @@ const filteredMovies = computed(() => {
 
   return allMovies.value.filter((movie: any) => {
     const s = searchQuery.value.toLowerCase()
-    
-    const matchesSearch = movie.title.toLowerCase().includes(s) || 
+
+    const matchesSearch = movie.title.toLowerCase().includes(s) ||
       movie.movie_directors?.some((d: any) => d.director.name.toLowerCase().includes(s))
-    
-    const matchesGenre = selectedGenre.value === '' || 
+
+    const matchesGenre = selectedGenre.value === '' ||
       movie.movie_genres?.some((g: any) => g.genre.name === selectedGenre.value)
-    
-    const matchesDirector = selectedDirector.value === '' || 
+
+    const matchesDirector = selectedDirector.value === '' ||
       movie.movie_directors?.some((d: any) => d.director.name === selectedDirector.value)
 
     const matchesDate = movie.schedules && movie.schedules.some((sch: any) => {
@@ -177,8 +329,68 @@ const filteredMovies = computed(() => {
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
 select option {
-  background: #121212;
-  color: white;
-  padding: 10px;
+  background: #0D0D0D;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.hero-bg {
+  animation: kenBurns 22s ease-in-out infinite;
+  will-change: transform;
+}
+@keyframes kenBurns {
+  0%, 100% { transform: scale(1.10); }
+  50%       { transform: scale(1.18); }
+}
+
+@keyframes heroFloat {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-16px); }
+}
+
+@keyframes heroFloatCenter {
+  0%, 100% { transform: translateY(0px) rotateZ(0deg); }
+  50%       { transform: translateY(-24px) rotateZ(0.4deg); }
+}
+
+.hero-side-card {
+  opacity: 0.82;
+  box-shadow:
+    0 28px 70px rgba(0, 0, 0, 0.75),
+    0  0  55px rgba(196, 146, 8, 0.07);
+  transition: opacity 0.4s ease, filter 0.4s ease;
+}
+.hero-side-card:hover {
+  opacity: 1;
+  filter: drop-shadow(0 0 45px rgba(196, 146, 8, 0.16));
+}
+
+.hero-center-card {
+  box-shadow:
+    0 48px 110px rgba(0, 0, 0, 0.95),
+    0  0   0  1px rgba(196, 146, 8, 0.30),
+    0  0  90px rgba(196, 146, 8, 0.20);
+  animation: coronaPulse 4.8s ease-in-out infinite;
+  will-change: opacity;
+}
+@keyframes coronaPulse {
+  0%, 100% { opacity: 0.90; }
+  50%       { opacity: 1; }
+}
+
+.hero-gold-glow {
+  text-shadow:
+    0 0 45px rgba(196, 146, 8, 0.38),
+    0 0 100px rgba(196, 146, 8, 0.16);
+}
+
+.hero-cta {
+  box-shadow:
+    0 0 0  1px rgba(196, 146, 8, 0.38),
+    0 8px 32px rgba(196, 146, 8, 0.24);
+}
+.hero-cta:hover {
+  box-shadow:
+    0 0 0  1px rgba(196, 146, 8, 0.58),
+    0 8px 44px rgba(196, 146, 8, 0.34);
 }
 </style>

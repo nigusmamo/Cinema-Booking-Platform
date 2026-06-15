@@ -1,56 +1,87 @@
 <template>
-  <div class="min-h-screen bg-[#0D0D0D] text-white py-10 px-4 font-sans flex flex-col items-center justify-center relative overflow-hidden">
-    
+  <div class="min-h-screen bg-[#090909] text-white font-sans flex flex-col items-center justify-center px-4 py-20">
+
+    <!-- Saving / loading -->
     <div v-if="isSaving" class="text-center">
-      <div class="w-16 h-16 border-4 border-[#EAB308] border-t-transparent rounded-full animate-spin mb-6 mx-auto"></div>
-      <h2 class="text-[#EAB308] text-xl font-black uppercase tracking-[0.3em] animate-pulse">Confirming Ticket</h2>
-      <p class="text-gray-500 mt-4 italic">Please wait while we secure your seats...</p>
+      <div class="w-8 h-8 border border-[#EAB308]/30 border-t-[#EAB308] rounded-full animate-spin mx-auto mb-5"></div>
+      <p class="text-white/30 text-[11px] font-medium tracking-[0.32em] uppercase">Confirming your ticket…</p>
     </div>
 
-    <div v-else-if="errorMessage" class="max-w-md w-full text-center bg-red-500/5 border border-red-500/20 p-10 rounded-[40px]">
-      <div class="text-6xl mb-6"></div>
-      <h2 class="text-2xl font-black uppercase text-red-500 mb-4">Booking Failed</h2>
-      <p class="text-gray-400 mb-8 italic text-sm">{{ errorMessage }}</p>
-      <button @click="navigateTo('/schedules')" class="bg-[#EAB308] text-black px-8 py-3 rounded-2xl font-bold">Try Again</button>
+    <!-- Error -->
+    <div v-else-if="errorMessage" class="max-w-sm w-full text-center bg-[#0D0D0D] border border-red-500/15 rounded-2xl p-10">
+      <div class="w-12 h-12 border border-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-5">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-red-400">
+          <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+        </svg>
+      </div>
+      <h2 class="text-white/80 text-lg font-medium mb-2">Booking Failed</h2>
+      <p class="text-white/30 text-[13px] mb-7 italic">{{ errorMessage }}</p>
+      <button @click="navigateTo('/schedules')"
+        class="bg-[#EAB308] text-black px-7 py-3 rounded-xl font-bold text-[11px] tracking-[0.18em] uppercase hover:bg-[#d4a007] transition-colors">
+        Try Again
+      </button>
     </div>
 
-    <div v-else class="max-w-4xl w-full text-center">
-      <h1 class="text-4xl md:text-6xl font-black text-white mb-4 tracking-tighter uppercase italic">
-        Booking <span class="text-[#EAB308]">Confirmed!</span>
-      </h1>
-      <p class="text-gray-400 mb-12">Your tickets are ready. Enjoy the show!</p>
+    <!-- Success -->
+    <div v-else class="max-w-2xl w-full">
 
-      <div v-if="movieInfo" class="max-w-2xl mx-auto bg-[#121212] border border-white/5 rounded-[40px] overflow-hidden shadow-2xl flex flex-col md:flex-row relative">
-          <div class="p-8 flex-1 flex gap-6 items-center border-b md:border-b-0 md:border-r-2 border-dashed border-gray-800">
-            <div class="w-28 h-40 rounded-2xl overflow-hidden border-2 border-white/5 flex-shrink-0 bg-gray-900">
-              <img :src="movieInfo.main_image" class="w-full h-full object-cover" referrerpolicy="no-referrer" />
-            </div>
-            <div class="text-left">
-              <h2 class="text-xl font-black text-white uppercase mb-3 leading-tight">{{ movieInfo.title }}</h2>
-              <div class="space-y-3">
-                <div>
-                  <p class="text-[9px] text-gray-500 font-black uppercase tracking-widest mb-1">Confirmed Seats</p>
-                  <p class="text-white font-black text-base">{{ selectedSeats.join(', ') }}</p>
-                </div>
-                <div>
-                  <p class="text-[9px] text-gray-500 font-black uppercase tracking-widest mb-1">Booking Ref</p>
-                  <p class="text-[#EAB308] font-black text-base">{{ bookingRef }}</p>
-                </div>
+      <!-- Header -->
+      <div class="text-center mb-10">
+        <div class="w-12 h-12 bg-[#EAB308]/10 border border-[#EAB308]/20 rounded-2xl flex items-center justify-center mx-auto mb-5">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#EAB308" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <h1 class="font-modern-luxury font-light text-4xl md:text-5xl mb-2 tracking-tight">Booking Confirmed</h1>
+        <p class="text-white/30 text-[13px]">Your tickets are ready. Enjoy the show.</p>
+      </div>
+
+      <!-- Ticket card -->
+      <div v-if="movieInfo" class="bg-[#0D0D0D] border border-white/[0.06] rounded-2xl overflow-hidden flex flex-col md:flex-row">
+
+        <!-- Left: movie info -->
+        <div class="flex-1 p-7 flex gap-5 items-start">
+          <img :src="movieInfo.main_image" class="w-20 h-28 rounded-xl object-cover flex-shrink-0 border border-white/[0.06]" referrerpolicy="no-referrer" />
+          <div>
+            <h2 class="font-modern-luxury font-light text-2xl tracking-tight mb-4 leading-tight">{{ movieInfo.title }}</h2>
+            <div class="space-y-3">
+              <div>
+                <p class="text-[9px] font-semibold tracking-[0.28em] text-white/25 uppercase mb-1">Seats</p>
+                <p class="text-white/70 text-[13px] font-medium">{{ selectedSeats.join(', ') }}</p>
+              </div>
+              <div>
+                <p class="text-[9px] font-semibold tracking-[0.28em] text-white/25 uppercase mb-1">Reference</p>
+                <p class="text-[#EAB308] text-[13px] font-semibold">{{ bookingRef }}</p>
               </div>
             </div>
           </div>
-          <div class="p-10 bg-white/5 flex flex-col items-center justify-center w-full md:w-56 gap-4 text-center">
-            <div class="w-32 h-32 bg-white rounded-3xl p-3">
-              <img :src="`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${bookingRef}`" class="w-full h-full" />
-            </div>
-            <p class="text-[8px] text-gray-500 font-black uppercase tracking-widest leading-relaxed">Present this at the gate</p>
+        </div>
+
+        <!-- Dashed divider -->
+        <div class="hidden md:block w-px border-l border-dashed border-white/[0.07] my-6"></div>
+
+        <!-- Right: QR code -->
+        <div class="md:w-48 flex flex-col items-center justify-center p-7 gap-3 border-t md:border-t-0 border-dashed border-white/[0.07]">
+          <div class="w-28 h-28 bg-white rounded-xl p-2 flex-shrink-0">
+            <img :src="`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${bookingRef}`" class="w-full h-full" />
           </div>
+          <p class="text-[9px] text-white/25 font-medium tracking-[0.18em] uppercase text-center">Present at the gate</p>
+        </div>
+
       </div>
 
-      <div class="mt-12 flex justify-center gap-4">
-        <button @click="navigateTo('/')" class="bg-[#EAB308] text-black px-12 py-4 rounded-2xl font-black text-xs uppercase hover:scale-105 transition-all">Back to Home</button>
-        <button @click="handlePrint" class="bg-white/5 border border-white/10 text-white px-12 py-4 rounded-2xl font-black text-xs uppercase hover:bg-white/10 transition-all">Download Ticket</button>
+      <!-- Actions -->
+      <div class="flex flex-col sm:flex-row justify-center gap-3 mt-8">
+        <button @click="navigateTo('/')"
+          class="inline-flex items-center justify-center gap-2 bg-[#EAB308] text-black px-8 py-3.5 rounded-xl font-bold text-[11px] tracking-[0.18em] uppercase hover:bg-[#d4a007] transition-colors">
+          Back to Home
+        </button>
+        <button @click="handlePrint"
+          class="inline-flex items-center justify-center gap-2 bg-transparent border border-white/[0.1] text-white/50 hover:text-white/80 hover:border-white/20 px-8 py-3.5 rounded-xl font-bold text-[11px] tracking-[0.18em] uppercase transition-colors">
+          Download Ticket
+        </button>
       </div>
+
     </div>
   </div>
 </template>

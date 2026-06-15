@@ -179,6 +179,27 @@ export const DELETE_MOVIE_IMAGES = gql`
   }
 `;
 
+export const GET_SEAT_PRICES = gql`
+  query GetSeatPrices {
+    seat_prices {
+      type
+      price
+    }
+  }
+`;
+
+export const UPDATE_SEAT_PRICE = gql`
+  mutation UpdateSeatPrice($type: String!, $price: numeric!) {
+    update_seat_prices_by_pk(
+      pk_columns: { type: $type }
+      _set: { price: $price }
+    ) {
+      type
+      price
+    }
+  }
+`;
+
 export const UPLOAD_FILE = gql`
   mutation UploadFile($base64_data: String!, $filename: String!) {
     upload_file(base64_data: $base64_data, filename: $filename) {

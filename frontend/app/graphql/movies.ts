@@ -81,6 +81,15 @@ export const GET_SCHEDULE_SEATS = gql`
   }
 `;
 
+export const GET_SEAT_PRICES = gql`
+  query GetSeatPrices {
+    seat_prices {
+      type
+      price
+    }
+  }
+`;
+
 export const GET_BOOKED_SEATS = gql`
   query GetBookedSeats($schedule_id: uuid!) {
     booking_seats(where: { 
