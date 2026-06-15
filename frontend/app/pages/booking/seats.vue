@@ -280,7 +280,8 @@ const selectedSeats = ref<string[]>([])
 onMounted(() => {
   loadBooking()
   if (savedMovie.value?.schedule_id === scheduleId && savedSeats.value.length > 0) {
-    selectedSeats.value = [...savedSeats.value]
+    const available = savedSeats.value.filter((s: string) => !alreadyBookedList.value.includes(s))
+    selectedSeats.value = available
   }
 })
 

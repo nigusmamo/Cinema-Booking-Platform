@@ -1,6 +1,5 @@
 // app/composables/useBooking.ts
 export const useBookingStore = () => {
-  // <any> እና <string[]> በማለት ለ TypeScript የሳጥኑን አይነት እንነግረዋለን
   const selectedMovie = useState<any>('selected_movie', () => null)
   const selectedSeats = useState<string[]>('selected_seats', () => [])
   const totalPrice = useState<number>('total_price', () => 0)
@@ -9,8 +8,7 @@ export const useBookingStore = () => {
     selectedMovie.value = movieData
     selectedSeats.value = seats
     totalPrice.value = price
-    
-    // በኑክስት 4 'import.meta.client' መጠቀም ይመከራል
+
     if (import.meta.client) {
       const cleanData = JSON.stringify({ movie: movieData, seats, price })
       localStorage.setItem('cinema_booking_storage', cleanData)
@@ -31,11 +29,21 @@ export const useBookingStore = () => {
     return false
   }
 
+  const clearBooking = () => {
+    selectedMovie.value = null
+    selectedSeats.value = []
+    totalPrice.value = 0
+    if (import.meta.client) {
+      localStorage.removeItem('cinema_booking_storage')
+    }
+  }
+
   return {
     selectedMovie,
     selectedSeats,
     totalPrice,
     saveBooking,
-    loadBooking
+    loadBooking,
+    clearBooking
   }
 }
