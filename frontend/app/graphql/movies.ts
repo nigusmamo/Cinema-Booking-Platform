@@ -34,11 +34,55 @@ export const GET_MOVIE_DETAILS = gql`
       movie_directors { director { name image_url } }
       movie_stars { star { name image_url } }
       movie_genres { genre { name } }
-      schedules {
+      schedules { id start_time }
+      ratings(order_by: { created_at: desc }, limit: 20) {
         id
-        start_time
+        rating_value
+        comment
+        created_at
+        user_id
       }
     }
+  }
+`;
+
+export const GET_USER_BOOKMARK = gql`
+  query GetUserBookmark($movie_id: uuid!, $user_id: uuid!) {
+    bookmarks(where: { movie_id: { _eq: $movie_id }, user_id: { _eq: $user_id } }) {
+      id
+    }
+  }
+`;
+
+export const INSERT_BOOKMARK = gql`
+  mutation InsertBookmark($movie_id: uuid!) {
+    insert_bookmarks_one(object: { movie_id: $movie_id }) { id }
+  }
+`;
+
+export const DELETE_BOOKMARK = gql`
+  mutation DeleteBookmark($id: uuid!) {
+    delete_bookmarks_by_pk(id: $id) { id }
+  }
+`;
+
+export const GET_USER_RATING = gql`
+  query GetUserRating($movie_id: uuid!, $user_id: uuid!) {
+    ratings(where: { movie_id: { _eq: $movie_id }, user_id: { _eq: $user_id } }) {
+      id rating_value comment
+    }
+  }
+`;
+
+export const INSERT_RATING = gql`
+  mutation InsertRating($movie_id: uuid!, $rating_value: Int!, $comment: String) {
+    insert_ratings_one(object: { movie_id: $movie_id, rating_value: $rating_value, comment: $comment }) { id }
+  }
+`;
+
+export const UPDATE_RATING = gql`
+  mutation UpdateRating($id: uuid!, $rating_value: Int!, $comment: String) {
+    update_ratings_by_pk(pk_columns: { id: $id }, _set: { rating_value: $rating_value, comment: $comment }) { id }
   }
 `;
 
@@ -139,16 +183,13 @@ export const GET_MY_PROFILE = gql`
         schedule {
           start_time
           end_time
-          movie {
-            id
-            title
-            main_image
-            duration_minutes
-          }
+          movie { id title main_image duration_minutes }
         }
-        booking_seats {
-          seat_id
-        }
+        booking_seats { seat_id }
+      }
+      bookmarks(order_by: { id: desc }) {
+        id
+        movie { id title main_image duration_minutes rating_avg }
       }
     }
   }

@@ -8,6 +8,37 @@ object_relationships:
   - name: user
     using:
       foreign_key_constraint_on: user_id
+insert_permissions:
+  - role: user
+    permission:
+      check: {}
+      set:
+        user_id: x-hasura-User-Id
+      columns:
+        - id
+        - rating_value
+        - comment
+        - movie_id
+        - user_id
+        - created_at
+    comment: ""
+update_permissions:
+  - role: user
+    permission:
+      filter:
+        user_id:
+          _eq: X-Hasura-User-Id
+      columns:
+        - rating_value
+        - comment
+    comment: ""
+delete_permissions:
+  - role: user
+    permission:
+      filter:
+        user_id:
+          _eq: X-Hasura-User-Id
+    comment: ""
 select_permissions:
   - role: anonymous
     permission:
@@ -19,6 +50,7 @@ select_permissions:
         - movie_id
         - user_id
       filter: {}
+      allow_aggregations: true
     comment: ""
   - role: user
     permission:
@@ -30,4 +62,5 @@ select_permissions:
         - movie_id
         - user_id
       filter: {}
+      allow_aggregations: true
     comment: ""
