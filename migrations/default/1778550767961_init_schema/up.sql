@@ -45,11 +45,6 @@ CREATE TABLE public.genres (
     name text NOT NULL
 );
 
-CREATE TABLE public.halls (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    name text NOT NULL
-);
-
 CREATE TABLE public.movie_directors (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     movie_id uuid NOT NULL,
@@ -101,7 +96,6 @@ CREATE TABLE public.ratings (
 CREATE TABLE public.schedules (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     movie_id uuid NOT NULL,
-    hall_id uuid NOT NULL,
     start_time timestamp with time zone NOT NULL,
     end_time timestamp with time zone NOT NULL,
     price numeric NOT NULL
@@ -109,7 +103,6 @@ CREATE TABLE public.schedules (
 
 CREATE TABLE public.seats (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
-    hall_id uuid NOT NULL,
     row_label text NOT NULL,
     column_number integer NOT NULL,
     type text DEFAULT 'standard'::text NOT NULL
@@ -155,9 +148,6 @@ ALTER TABLE ONLY public.genres
 ALTER TABLE ONLY public.genres
     ADD CONSTRAINT genres_pkey PRIMARY KEY (id);
     
-ALTER TABLE ONLY public.halls
-    ADD CONSTRAINT halls_pkey PRIMARY KEY (id);
-
 ALTER TABLE ONLY public.movie_directors
     ADD CONSTRAINT movie_directors_pkey PRIMARY KEY (id);
 
@@ -240,10 +230,5 @@ ALTER TABLE ONLY public.ratings
     ADD CONSTRAINT ratings_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.schedules
-    ADD CONSTRAINT schedules_hall_id_fkey FOREIGN KEY (hall_id) REFERENCES public.halls(id) ON DELETE CASCADE;
-
-ALTER TABLE ONLY public.schedules
     ADD CONSTRAINT schedules_movie_id_fkey FOREIGN KEY (movie_id) REFERENCES public.movies(id) ON DELETE CASCADE;
 
-ALTER TABLE ONLY public.seats
-    ADD CONSTRAINT seats_hall_id_fkey FOREIGN KEY (hall_id) REFERENCES public.halls(id) ON DELETE CASCADE;

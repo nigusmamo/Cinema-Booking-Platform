@@ -16,7 +16,7 @@ export const useAuth = () => {
 
     try {
       const client = resolveClient()
-      
+
       // 1. Fetch Basic Profile
       const { data } = await client.query({
         query: GET_ME,
@@ -27,15 +27,15 @@ export const useAuth = () => {
           }
         }
       })
-      
+
       if (data?.users?.length > 0) {
         const userIdCookie = useCookie('user_id')
         const rawUserData = data.users.find((u: any) => u.id === userIdCookie.value) || data.users[0]
         const userData = { ...rawUserData }
-        
+
         // 2. Detect Admin Status robustly
         let isAdminFlag = userData.email?.toLowerCase().includes('admin')
-        
+
         try {
           const { data: adminCheck } = await client.query({
             query: gql`query AdminCheck { movies_aggregate { aggregate { count } } }`,
@@ -49,7 +49,7 @@ export const useAuth = () => {
           if (adminCheck?.movies_aggregate) {
             isAdminFlag = true
           }
-        } catch (e) {}
+        } catch (e) { }
 
         userData.is_admin = isAdminFlag
         user.value = userData
@@ -69,13 +69,16 @@ export const useAuth = () => {
   const logout = async () => {
     // 1. Clear Apollo Cache and Cookie
     await onLogout()
-    
+
     // 2. Clear Vue State
     user.value = null
     const userIdCookie = useCookie('user_id')
     userIdCookie.value = null
-    
-    // 3. Redirect
+
+    const { clearBooking } = useBookingStore()
+    clearBooking()
+
+    // 4. Redirect
     await navigateTo('/auth/login')
   }
 

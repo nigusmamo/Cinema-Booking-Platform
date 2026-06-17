@@ -1,30 +1,17 @@
 
 -- ============================================================
--- HALLS
--- ============================================================
-CREATE TABLE IF NOT EXISTS public.halls (
-    id   uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-    name text NOT NULL
-);
-
-INSERT INTO public.halls (id, name)
-VALUES ('11111111-1111-1111-1111-111111111111', 'Grand Cinema Hall')
-ON CONFLICT (id) DO NOTHING;
-
--- ============================================================
 -- SEATS  (rows A-J, 16 columns each)
 -- ============================================================
 DO $$
 DECLARE
-    h_id UUID := '11111111-1111-1111-1111-111111111111';
     r    TEXT;
     c    INTEGER;
 BEGIN
     FOR r IN SELECT unnest(ARRAY['A','B','C','D','E','F','G','H','I','J']) LOOP
         FOR c IN 1..16 LOOP
-            INSERT INTO public.seats (id, hall_id, row_label, column_number, type)
+            INSERT INTO public.seats (id, row_label, column_number, type)
             VALUES (
-                gen_random_uuid(), h_id, r, c,
+                gen_random_uuid(), r, c,
                 CASE WHEN r = 'A' THEN 'vip'
                      WHEN r = 'B' THEN 'couple'
                      ELSE 'standard' END
@@ -35,7 +22,6 @@ END $$;
 
 DO $$
 DECLARE
-    h_id      UUID := '11111111-1111-1111-1111-111111111111';
     m_id      UUID;
     dur_min   INTEGER;
     base_date DATE := CURRENT_DATE;
@@ -136,11 +122,10 @@ BEGIN
                           + rec.day_offset * INTERVAL '1 day'
                           + showtime;
 
-                INSERT INTO public.schedules (id, movie_id, hall_id, start_time, end_time)
+                INSERT INTO public.schedules (id, movie_id, start_time, end_time)
                 VALUES (
                     gen_random_uuid(),
                     m_id,
-                    h_id,
                     start_dt,
                     start_dt + dur_min * INTERVAL '1 minute'
                 );
