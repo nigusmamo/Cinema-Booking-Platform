@@ -9,7 +9,6 @@ type ChapaRequest struct {
 	TxRef          string                 `json:"tx_ref"` 
 	CallbackURL    string                 `json:"callback_url"`
 	ReturnURL      string                 `json:"return_url"`
-	Customization  map[string]interface{} `json:"customization"`
 }
 
 type ChapaResponse struct {
