@@ -33,8 +33,7 @@ export const useAuth = () => {
         const rawUserData = data.users.find((u: any) => u.id === userIdCookie.value) || data.users[0]
         const userData = { ...rawUserData }
 
-        // 2. Detect Admin Status robustly
-        let isAdminFlag = userData.email?.toLowerCase().includes('admin')
+        let isAdminFlag = false
 
         try {
           const { data: adminCheck } = await client.query({
