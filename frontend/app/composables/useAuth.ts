@@ -1,5 +1,22 @@
-import { gql } from '#imports'
 import { GET_ME } from '~/graphql/movies'
+
+const decodeRoleFromToken = (token: string): string | null => {
+  try {
+    const payload = token.split('.')[1]
+    if (!payload) return null
+    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/')
+    const json = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    )
+    const claims = JSON.parse(json)
+    return claims?.['https://hasura.io/jwt/claims']?.['x-hasura-default-role'] ?? null
+  } catch {
+    return null
+  }
+}
 
 export const useAuth = () => {
   const user = useState<any>('auth_user', () => null)
@@ -33,24 +50,7 @@ export const useAuth = () => {
         const rawUserData = data.users.find((u: any) => u.id === userIdCookie.value) || data.users[0]
         const userData = { ...rawUserData }
 
-        let isAdminFlag = false
-
-        try {
-          const { data: adminCheck } = await client.query({
-            query: gql`query AdminCheck { movies_aggregate { aggregate { count } } }`,
-            fetchPolicy: 'network-only',
-            context: {
-              headers: {
-                Authorization: `Bearer ${token}`
-              }
-            }
-          })
-          if (adminCheck?.movies_aggregate) {
-            isAdminFlag = true
-          }
-        } catch (e) { }
-
-        userData.is_admin = isAdminFlag
+        userData.is_admin = decodeRoleFromToken(token) === 'admin'
         user.value = userData
       } else {
         user.value = null
