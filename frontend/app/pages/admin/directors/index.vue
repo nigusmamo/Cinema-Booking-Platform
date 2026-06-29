@@ -6,19 +6,35 @@
       <div>
         <p class="text-[10px] font-semibold tracking-[0.3em] text-white/25 uppercase mb-1">Creative Team</p>
         <h1 class="text-[22px] font-semibold text-white tracking-tight leading-none mb-1">Directors</h1>
-        <p class="text-[12px] text-white/30">{{ directors.length }} total directors</p>
+        <p class="text-[12px] text-white/30">{{ filteredDirectors.length }} total directors</p>
       </div>
 
-      <button
-        @click="openModal()"
-        class="inline-flex items-center gap-2 bg-[#EAB308] text-black px-5 py-2.5 rounded-lg text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#d4a007] active:scale-[0.98] transition-all self-start sm:self-auto"
-      >
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="5" x2="12" y2="19"></line>
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
-        Add Director
-      </button>
+      <div class="flex items-center gap-3">
+        <!-- Search -->
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Search directors..."
+            class="w-60 bg-[#111111] border border-white/[0.08] rounded-xl pl-9 pr-4 py-2.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#EAB308]/50 transition-all"
+          />
+        </div>
+
+        <button
+          @click="openModal()"
+          class="inline-flex items-center gap-2 bg-[#EAB308] text-black px-5 py-2.5 rounded-lg text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#d4a007] active:scale-[0.98] transition-all"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Add Director
+        </button>
+      </div>
     </div>
 
     <!-- Skeleton -->
@@ -27,7 +43,7 @@
     </div>
 
     <!-- Empty State -->
-    <div v-else-if="directors.length === 0" class="py-20 flex flex-col items-center justify-center gap-3">
+    <div v-else-if="filteredDirectors.length === 0" class="py-20 flex flex-col items-center justify-center gap-3">
       <div class="w-12 h-12 rounded-2xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-white/20">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -40,7 +56,7 @@
     <!-- Director Grid -->
     <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">
       <div
-        v-for="director in directors"
+        v-for="director in paginatedDirectors"
         :key="director.id"
         class="group bg-[#0D0D0D] border border-white/[0.06] rounded-2xl p-5 flex flex-col items-center text-center hover:border-white/[0.12] transition-all duration-300"
       >
@@ -81,6 +97,9 @@
         </div>
       </div>
     </div>
+
+    <!-- Pagination -->
+    <AdminPagination v-model="currentPage" :total-items="filteredDirectors.length" :page-size="pageSize" />
 
   </div>
 
@@ -164,6 +183,28 @@ const { resolveClient } = useApolloClient()
 const authCookie = useCookie('auth_token')
 
 const directors = computed(() => result.value?.directors || [])
+
+const searchQuery = ref('')
+const filteredDirectors = computed(() => {
+  if (!searchQuery.value) return directors.value
+  const query = searchQuery.value.toLowerCase()
+  return directors.value.filter((d: any) => d.name.toLowerCase().includes(query))
+})
+
+// Pagination
+const pageSize = 18
+const currentPage = ref(1)
+const paginatedDirectors = computed(() => {
+  const start = (currentPage.value - 1) * pageSize
+  return filteredDirectors.value.slice(start, start + pageSize)
+})
+
+// Reset to first page on search; clamp if the list shrinks (e.g. after delete)
+watch(searchQuery, () => { currentPage.value = 1 })
+watch(filteredDirectors, (list) => {
+  const lastPage = Math.max(1, Math.ceil(list.length / pageSize))
+  if (currentPage.value > lastPage) currentPage.value = lastPage
+})
 
 // Modal Logic
 const showModal = ref(false)

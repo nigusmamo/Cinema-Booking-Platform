@@ -6,19 +6,35 @@
       <div>
         <p class="text-[10px] font-semibold tracking-[0.3em] text-white/25 uppercase mb-1">Programming</p>
         <h1 class="text-[22px] font-semibold text-white tracking-tight leading-none mb-1">Schedules</h1>
-        <p class="text-[12px] text-white/30">{{ schedules.length }} total schedules</p>
+        <p class="text-[12px] text-white/30">{{ filteredSchedules.length }} total schedules</p>
       </div>
 
-      <button
-        @click="openModal()"
-        class="inline-flex items-center gap-2 bg-[#EAB308] text-black px-5 py-2.5 rounded-lg text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#d4a007] active:scale-[0.98] transition-all self-start sm:self-auto"
-      >
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="5" x2="12" y2="19"></line>
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
-        Add Schedule
-      </button>
+      <div class="flex items-center gap-3">
+        <!-- Search -->
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Search by film..."
+            class="w-60 bg-[#111111] border border-white/[0.08] rounded-xl pl-9 pr-4 py-2.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#EAB308]/50 transition-all"
+          />
+        </div>
+
+        <button
+          @click="openModal()"
+          class="inline-flex items-center gap-2 bg-[#EAB308] text-black px-5 py-2.5 rounded-lg text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#d4a007] active:scale-[0.98] transition-all"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Add Schedule
+        </button>
+      </div>
     </div>
 
     <!-- Loading -->
@@ -27,7 +43,7 @@
     </div>
 
     <!-- Empty State -->
-    <div v-else-if="schedules.length === 0" class="py-20 flex flex-col items-center justify-center gap-3">
+    <div v-else-if="filteredSchedules.length === 0" class="py-20 flex flex-col items-center justify-center gap-3">
       <div class="w-12 h-12 rounded-2xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-white/20">
           <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -52,7 +68,7 @@
 
       <!-- Rows -->
       <div
-        v-for="schedule in schedules"
+        v-for="schedule in paginatedSchedules"
         :key="schedule.id"
         class="grid grid-cols-[56px_1fr_auto] md:grid-cols-[80px_1fr_140px_100px_80px] gap-4 items-center px-6 py-4 border-b border-white/[0.04] last:border-b-0 hover:bg-white/[0.02] transition-colors"
       >
@@ -97,6 +113,9 @@
       </div>
     </div>
 
+    <!-- Pagination -->
+    <AdminPagination v-model="currentPage" :total-items="filteredSchedules.length" :page-size="pageSize" />
+
     <!-- Modal for Create/Edit -->
     <AdminModal v-if="showModal" :title="editId ? 'Edit Schedule' : 'Add Schedule'" @close="closeModal" max-width="max-w-md">
       <form @submit.prevent="handleSubmit" class="space-y-5">
@@ -116,11 +135,11 @@
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35 mb-2">Start Time</label>
-            <input v-model="form.start_time" type="datetime-local" required class="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#EAB308]/50 transition-all" style="color-scheme: dark;">
+            <input v-model="form.start_time" type="datetime-local" :min="minDateTime" required class="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#EAB308]/50 transition-all" style="color-scheme: dark;">
           </div>
           <div>
             <label class="block text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35 mb-2">End Time</label>
-            <input v-model="form.end_time" type="datetime-local" required class="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#EAB308]/50 transition-all" style="color-scheme: dark;">
+            <input v-model="form.end_time" type="datetime-local" :min="form.start_time || minDateTime" required class="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#EAB308]/50 transition-all" style="color-scheme: dark;">
           </div>
         </div>
 
@@ -165,6 +184,28 @@ const authCookie = useCookie('auth_token')
 
 const schedules = computed(() => data.value?.schedules || [])
 
+const searchQuery = ref('')
+const filteredSchedules = computed(() => {
+  if (!searchQuery.value) return schedules.value
+  const query = searchQuery.value.toLowerCase()
+  return schedules.value.filter((s: any) => s.movie?.title?.toLowerCase().includes(query))
+})
+
+// Pagination
+const pageSize = 10
+const currentPage = ref(1)
+const paginatedSchedules = computed(() => {
+  const start = (currentPage.value - 1) * pageSize
+  return filteredSchedules.value.slice(start, start + pageSize)
+})
+
+// Reset to first page on search; clamp if the list shrinks (e.g. after delete)
+watch(searchQuery, () => { currentPage.value = 1 })
+watch(filteredSchedules, (list) => {
+  const lastPage = Math.max(1, Math.ceil(list.length / pageSize))
+  if (currentPage.value > lastPage) currentPage.value = lastPage
+})
+
 // Modal Logic
 const showModal = ref(false)
 const editId = ref<string | null>(null)
@@ -175,6 +216,13 @@ const form = reactive({
   movie_id: '',
   start_time: '',
   end_time: ''
+})
+
+// Earliest selectable datetime (now), formatted for a datetime-local input in local time
+const minDateTime = computed(() => {
+  const d = new Date()
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
+  return d.toISOString().slice(0, 16)
 })
 
 const openModal = (schedule?: any) => {
@@ -199,6 +247,19 @@ const closeModal = () => {
 
 const handleSubmit = async () => {
   errorMessage.value = ''
+
+  // Guard against scheduling in the past or an end that is not after the start
+  const start = new Date(form.start_time)
+  const end = new Date(form.end_time)
+  if (start.getTime() < Date.now()) {
+    errorMessage.value = 'Start time cannot be in the past.'
+    return
+  }
+  if (end <= start) {
+    errorMessage.value = 'End time must be after the start time.'
+    return
+  }
+
   isSubmitting.value = true
 
   try {

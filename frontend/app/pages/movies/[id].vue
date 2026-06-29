@@ -484,13 +484,23 @@ onMounted(async () => {
   }
 })
 
-const availableDates = computed(() => {
+// Only schedules from today onward — past dates must not be bookable.
+const upcomingSchedules = computed(() => {
   if (!movie.value?.schedules) return []
+  const now = new Date()
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+  return movie.value.schedules.filter((s: any) => {
+    const d = new Date(s.start_time)
+    const sDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    return sDate >= today
+  })
+})
 
+const availableDates = computed(() => {
   const daysMap = new Map()
   const dateNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-  movie.value.schedules.forEach((s: any) => {
+  upcomingSchedules.value.forEach((s: any) => {
     const d = new Date(s.start_time)
     const fullDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 
@@ -507,8 +517,8 @@ const availableDates = computed(() => {
 })
 
 const availableTimes = computed(() => {
-  if (!selectedDate.value || !movie.value?.schedules) return []
-  return movie.value.schedules.filter((s: any) => {
+  if (!selectedDate.value) return []
+  return upcomingSchedules.value.filter((s: any) => {
   const d = new Date(s.start_time)
   const sDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
   return sDate === selectedDate.value

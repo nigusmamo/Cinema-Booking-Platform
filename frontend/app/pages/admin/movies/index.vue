@@ -59,12 +59,15 @@
     <!-- Movie Grid -->
     <div v-else class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
       <AdminMovieCard
-        v-for="movie in filteredMovies"
+        v-for="movie in paginatedMovies"
         :key="movie.id"
         :movie="movie"
         @delete="confirmDelete"
       />
     </div>
+
+    <!-- Pagination -->
+    <AdminPagination v-model="currentPage" :total-items="filteredMovies.length" :page-size="pageSize" />
 
     <!-- Delete Confirmation Modal -->
     <AdminDeleteConfirm
@@ -93,6 +96,21 @@ const filteredMovies = computed(() => {
   if (!searchQuery.value) return movies.value
   const query = searchQuery.value.toLowerCase()
   return movies.value.filter((m: any) => m.title.toLowerCase().includes(query))
+})
+
+// Pagination
+const pageSize = 12
+const currentPage = ref(1)
+const paginatedMovies = computed(() => {
+  const start = (currentPage.value - 1) * pageSize
+  return filteredMovies.value.slice(start, start + pageSize)
+})
+
+// Reset to first page on search; clamp if the list shrinks (e.g. after delete)
+watch(searchQuery, () => { currentPage.value = 1 })
+watch(filteredMovies, (list) => {
+  const lastPage = Math.max(1, Math.ceil(list.length / pageSize))
+  if (currentPage.value > lastPage) currentPage.value = lastPage
 })
 
 // Delete Logic

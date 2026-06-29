@@ -97,7 +97,7 @@ const handleLogin = async () => {
         localStorage.removeItem('cinema_redirect_after_login')
         await navigateTo(pendingRedirect)
       } else if (isAdmin.value) {
-        await navigateTo('/admin/movies')
+        await navigateTo('/admin')
       } else {
         await navigateTo('/')
       }
