@@ -34,6 +34,20 @@
         </div>
       </div>
 
+      <!-- Search -->
+      <div class="relative mt-4">
+        <svg class="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Search movies on this date..."
+          class="w-full bg-[#0D0D0D] border border-white/[0.06] rounded-2xl pl-11 pr-4 py-3.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#EAB308]/50 transition-all"
+        />
+      </div>
+
     </div>
 
     <!-- CONTENT -->
@@ -123,8 +137,14 @@
             <line x1="3" y1="10" x2="21" y2="10"/>
           </svg>
         </div>
-        <p class="text-white/20 text-[11px] font-medium tracking-[0.22em] uppercase">No screenings today</p>
-        <p class="text-white/[0.1] text-[10px] tracking-widest mt-2 uppercase">Select another date to see what's on</p>
+        <template v-if="searchQuery.trim()">
+          <p class="text-white/20 text-[11px] font-medium tracking-[0.22em] uppercase">No matching movies</p>
+          <p class="text-white/[0.1] text-[10px] tracking-widest mt-2 uppercase">Try a different title or date</p>
+        </template>
+        <template v-else>
+          <p class="text-white/20 text-[11px] font-medium tracking-[0.22em] uppercase">No screenings today</p>
+          <p class="text-white/[0.1] text-[10px] tracking-widest mt-2 uppercase">Select another date to see what's on</p>
+        </template>
       </div>
 
     </div>
@@ -155,13 +175,18 @@ const dynamicDays = computed(() => {
 })
 
 const selectedDate = ref(new Date().toISOString().split('T')[0])
+const searchQuery = ref('')
 
 const getSchedulesForDate = (movie: any) => {
   return movie.schedules.filter((s: any) => s.start_time.startsWith(selectedDate.value))
 }
 
 const filteredMovies = computed(() => {
-  return movies.value.filter((m: any) => getSchedulesForDate(m).length > 0)
+  const query = searchQuery.value.trim().toLowerCase()
+  return movies.value.filter((m: any) => {
+    if (getSchedulesForDate(m).length === 0) return false
+    return !query || m.title.toLowerCase().includes(query)
+  })
 })
 
 const formatTime = (isoString: string) => {

@@ -45,6 +45,22 @@
       <!-- Nav -->
       <nav class="flex-1 px-3 pt-4 space-y-0.5 overflow-y-auto">
         <NuxtLink
+          to="/admin"
+          class="flex items-center gap-3 py-2.5 rounded-xl text-[12px] font-semibold transition-all"
+          :class="$route.path === '/admin'
+            ? 'pl-[14px] text-white bg-[#EAB308]/[0.08] border-l-2 border-[#EAB308]'
+            : 'px-4 text-white/40 hover:text-white/70 hover:bg-white/[0.03]'"
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="9"></rect>
+            <rect x="14" y="3" width="7" height="5"></rect>
+            <rect x="14" y="12" width="7" height="9"></rect>
+            <rect x="3" y="16" width="7" height="5"></rect>
+          </svg>
+          Dashboard
+        </NuxtLink>
+
+        <NuxtLink
           to="/admin/movies"
           class="flex items-center gap-3 py-2.5 rounded-xl text-[12px] font-semibold transition-all"
           :class="$route.path.startsWith('/admin/movies')
