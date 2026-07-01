@@ -172,13 +172,13 @@ import {
   GET_ADMIN_FORM_DATA,
   INSERT_STAR,
   UPDATE_STAR,
-  DELETE_STAR,
-  UPLOAD_FILE
+  DELETE_STAR
 } from '~/graphql/admin'
 import { useQuery, useApolloClient } from '@vue/apollo-composable'
 
 const { result, loading: pending, refetch } = useQuery(GET_ADMIN_FORM_DATA)
 const { resolveClient } = useApolloClient()
+const { uploadImage } = useUpload()
 const authCookie = useCookie('auth_token')
 
 const stars = computed(() => result.value?.stars || [])
@@ -263,15 +263,6 @@ const handleFileSelect = (e: Event) => {
   if (file) processFile(file)
 }
 
-const fileToBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.readAsDataURL(file)
-    reader.onload = () => resolve(reader.result as string)
-    reader.onerror = error => reject(error)
-  })
-}
-
 const handleSubmit = async () => {
   errorMessage.value = ''
   isSubmitting.value = true
@@ -283,14 +274,7 @@ const handleSubmit = async () => {
     let imageUrl = existingImageUrl.value
 
     if (imageFile.value) {
-      const base64Data = await fileToBase64(imageFile.value)
-      const uploadRes = await client.mutate({
-        mutation: UPLOAD_FILE,
-        variables: { base64_data: base64Data, filename: imageFile.value.name },
-        context: { headers }
-      })
-      imageUrl = uploadRes.data?.upload_file?.url
-      if (!imageUrl) throw new Error("Image upload failed.")
+      imageUrl = await uploadImage(imageFile.value, client)
     }
 
     if (editId.value) {

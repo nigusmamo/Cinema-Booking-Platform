@@ -20,9 +20,6 @@ func main() {
 	routes.PaymentRoutes(r)
 	routes.UploadRoutes(r)
 
-	// Serve static files for uploads
-	r.Static("/uploads", "./uploads")
-
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "Server is running"}) 
 	})

@@ -237,7 +237,6 @@
 definePageMeta({ layout: 'admin' })
 import {
   GET_ADMIN_FORM_DATA,
-  UPLOAD_FILE,
   UPDATE_MOVIE,
   DELETE_MOVIE_DIRECTORS,
   INSERT_MOVIE_DIRECTORS,
@@ -255,6 +254,7 @@ const movieId = route.params.id as string
 
 const { data: formData, pending: pendingFormData } = await useAsyncQuery<any>(GET_ADMIN_FORM_DATA)
 const { resolveClient } = useApolloClient()
+const { uploadImage } = useUpload()
 const authCookie = useCookie('auth_token')
 
 const form = reactive({
@@ -311,9 +311,7 @@ const uploadNewGalleryImages = async () => {
     const headers = { Authorization: `Bearer ${authCookie.value}` }
     const uploadedUrls: string[] = []
     for (const file of galleryFiles.value) {
-      const b64 = await fileToBase64(file)
-      const res = await client.mutate({ mutation: UPLOAD_FILE, variables: { base64_data: b64, filename: file.name }, context: { headers } })
-      if (res.data?.upload_file?.url) uploadedUrls.push(res.data.upload_file.url)
+      uploadedUrls.push(await uploadImage(file, client))
     }
     if (uploadedUrls.length > 0) {
       await client.mutate({ mutation: INSERT_MOVIE_IMAGES, variables: { objects: uploadedUrls.map(url => ({ movie_id: movieId, image_url: url })) }, context: { headers } })
@@ -398,15 +396,6 @@ const handleFileSelect = (e: Event, type: 'main') => {
   if (file) processFile(file, type)
 }
 
-const fileToBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.readAsDataURL(file)
-    reader.onload = () => resolve(reader.result as string)
-    reader.onerror = error => reject(error)
-  })
-}
-
 const handleSubmit = async () => {
   errorMessage.value = ''
   isSubmitting.value = true
@@ -417,19 +406,9 @@ const handleSubmit = async () => {
 
     let imageUrl: string = existingImageUrl.value || ''
 
-    // 1. Upload Image via Hasura Action if changed
+    // 1. Upload the main image directly to Cloudinary via a signed upload
     if (mainImageFile.value) {
-      const base64Data = await fileToBase64(mainImageFile.value)
-      const uploadRes = await client.mutate({
-        mutation: UPLOAD_FILE,
-        variables: {
-          base64_data: base64Data,
-          filename: mainImageFile.value.name
-        },
-        context: { headers }
-      })
-      imageUrl = uploadRes.data?.upload_file?.url
-      if (!imageUrl) throw new Error("Image upload failed.")
+      imageUrl = await uploadImage(mainImageFile.value, client)
     }
 
     // 2. Update Movie
