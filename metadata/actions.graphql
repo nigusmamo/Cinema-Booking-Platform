@@ -23,10 +23,7 @@ type Mutation {
 }
 
 type Mutation {
-  upload_file(
-    base64_data: String!
-    filename: String!
-  ): FileUploadOutput
+  get_upload_signature: UploadSignatureOutput
 }
 
 type LoginOutput {
@@ -46,7 +43,11 @@ type PaymentOutput {
   tx_ref: String!
 }
 
-type FileUploadOutput {
-  url: String!
+type UploadSignatureOutput {
+  signature: String!
+  timestamp: Int!
+  api_key: String!
+  cloud_name: String!
+  folder: String!
 }
 

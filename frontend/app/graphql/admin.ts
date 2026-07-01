@@ -200,10 +200,14 @@ export const UPDATE_SEAT_PRICE = gql`
   }
 `;
 
-export const UPLOAD_FILE = gql`
-  mutation UploadFile($base64_data: String!, $filename: String!) {
-    upload_file(base64_data: $base64_data, filename: $filename) {
-      url
+export const GET_UPLOAD_SIGNATURE = gql`
+  mutation GetUploadSignature {
+    get_upload_signature {
+      signature
+      timestamp
+      api_key
+      cloud_name
+      folder
     }
   }
 `;

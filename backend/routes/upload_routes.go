@@ -8,6 +8,6 @@ import (
 func UploadRoutes(r *gin.Engine) {
 	uploadGroup := r.Group("/upload")
 	{
-		uploadGroup.POST("/file", controllers.UploadFileHandler)
+		uploadGroup.POST("/signature", controllers.UploadSignatureHandler)
 	}
 }

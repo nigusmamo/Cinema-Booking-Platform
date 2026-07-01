@@ -218,7 +218,6 @@
 definePageMeta({ layout: 'admin' })
 import { useForm, useField } from 'vee-validate'
 import {
-  UPLOAD_FILE,
   INSERT_MOVIE,
   GET_ADMIN_FORM_DATA,
   INSERT_MOVIE_GENRES,
@@ -229,6 +228,7 @@ import {
 } from '~/graphql/admin'
 
 const { resolveClient } = await useApolloClient()
+const { uploadImage } = useUpload()
 const authCookie = useCookie('auth_token')
 
 // Fetch Form Data
@@ -344,15 +344,6 @@ const handleFileSelect = (e: Event, type: 'main') => {
   if (file) processFile(file, type)
 }
 
-const fileToBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.readAsDataURL(file)
-    reader.onload = () => resolve(reader.result as string)
-    reader.onerror = error => reject(error)
-  })
-}
-
 const onSubmit = handleSubmit(async (values: MovieFormValues) => {
   errorMessage.value = ''
 
@@ -366,20 +357,8 @@ const onSubmit = handleSubmit(async (values: MovieFormValues) => {
     const client = resolveClient()
     const headers = { Authorization: `Bearer ${authCookie.value}` }
 
-    // 1. Upload Image via Hasura Action
-    const base64Data = await fileToBase64(mainImageFile.value)
-
-    const uploadRes = await client.mutate({
-      mutation: UPLOAD_FILE,
-      variables: {
-        base64_data: base64Data,
-        filename: mainImageFile.value.name
-      },
-      context: { headers }
-    })
-
-    const imageUrl = uploadRes.data?.upload_file?.url
-    if (!imageUrl) throw new Error("Image upload failed.")
+    // 1. Upload main image directly to Cloudinary via a signed upload
+    const imageUrl = await uploadImage(mainImageFile.value, client)
 
     // 2. Insert Movie
     const now = new Date().toISOString()
@@ -451,9 +430,7 @@ const onSubmit = handleSubmit(async (values: MovieFormValues) => {
     if (galleryFiles.value.length > 0) {
       const uploadedUrls: string[] = []
       for (const file of galleryFiles.value) {
-        const b64 = await fileToBase64(file)
-        const res = await client.mutate({ mutation: UPLOAD_FILE, variables: { base64_data: b64, filename: file.name }, context: { headers } })
-        if (res.data?.upload_file?.url) uploadedUrls.push(res.data.upload_file.url)
+        uploadedUrls.push(await uploadImage(file, client))
       }
       if (uploadedUrls.length > 0) {
         await client.mutate({
