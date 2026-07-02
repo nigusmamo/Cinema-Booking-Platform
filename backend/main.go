@@ -14,7 +14,6 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	utils.ConnectDB()
 	r := gin.Default()
 	routes.AuthRoutes(r)
 	routes.PaymentRoutes(r)
