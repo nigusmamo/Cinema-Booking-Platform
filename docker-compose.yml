@@ -9,14 +9,23 @@ services:
       POSTGRES_DB: cinema_db
     ports:
       - "5432:5432"
+    networks:
+      - cinema
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d cinema_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   graphql-engine:
     image: hasura/graphql-engine:v2.38.0
+    restart: always
     ports:
       - "8080:8080"
     depends_on:
-      - postgres
-    restart: always
+      postgres:
+        condition: service_healthy
     environment:
       HASURA_GRAPHQL_JWT_SECRET: ${HASURA_GRAPHQL_JWT_SECRET}
       HASURA_GRAPHQL_DATABASE_URL: ${HASURA_GRAPHQL_DATABASE_URL}
@@ -24,6 +33,77 @@ services:
       HASURA_GRAPHQL_ADMIN_SECRET: ${HASURA_GRAPHQL_ADMIN_SECRET}
       HASURA_GRAPHQL_DEV_MODE: "true"
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - cinema
+    healthcheck:
+      # The Hasura image ships curl (not wget).
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/healthz || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # Go backend (Gin) — hot reload via Air, source bind-mounted for development.
+  backend:
+    build:
+      context: ./backend
+      target: dev
+    restart: always
+    env_file:
+      - ./backend/.env
+    environment:
+
+      HASURA_GRAPHQL_URL: http://graphql-engine:8080/v1/graphql
+    ports:
+      # Published so Hasura's Action handlers (host.docker.internal:8000) reach it.
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      # Keep Air's compiled linux binary out of the host source tree.
+      - backend_tmp:/app/tmp
+    depends_on:
+      postgres:
+        condition: service_healthy
+      graphql-engine:
+        condition: service_started
+    networks:
+      - cinema
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8000/ping || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  # Nuxt frontend — dev server with HMR, source bind-mounted.
+  frontend:
+    build:
+      context: ./frontend
+      target: dev
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      HOST: 0.0.0.0
+      PORT: "3000"
+      CHOKIDAR_USEPOLLING: "true"
+      NUXT_TELEMETRY_DISABLED: "1"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.nuxt
+    depends_on:
+      graphql-engine:
+        condition: service_started
+    networks:
+      - cinema
 
 volumes:
   db_data:
+  backend_tmp:
+
+networks:
+  cinema:
+    driver: bridge

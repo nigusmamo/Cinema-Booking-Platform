@@ -1,0 +1,14 @@
+# Never copy host (darwin) node_modules or build artifacts into the image.
+# The container builds its own linux-native node_modules.
+node_modules
+.nuxt
+.output
+.nitro
+.cache
+dist
+.git
+.DS_Store
+*.log
+.env
+.env.*
+!.env.example
