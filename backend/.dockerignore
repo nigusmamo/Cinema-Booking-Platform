@@ -1,0 +1,8 @@
+# Keep the build context small and never bake secrets/artifacts into layers.
+.git
+tmp
+uploads
+*.log
+.DS_Store
+# Secrets: provided at runtime via env_file / environment, never copied in.
+.env
