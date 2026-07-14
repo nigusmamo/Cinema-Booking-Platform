@@ -319,7 +319,7 @@ const { data, pending } = await useAsyncQuery<any>(GET_MOVIE_DETAILS, { id: movi
 const movie = computed(() => data.value?.movies_by_pk)
 
 // Auth
-const { isAuthenticated } = useAuth()
+const { isAuthenticated } = storeToRefs(useAuthStore())
 const authCookie = useCookie('auth_token')
 const userIdCookie = useCookie('user_id')
 const { resolveClient } = useApolloClient()

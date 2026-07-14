@@ -180,7 +180,9 @@
 
 <script setup lang="ts">
 const isSidebarOpen = ref(false)
-const { user, userInitial, isAdmin, logout, fetchUser } = useAuth()
+const auth = useAuthStore()
+const { user, userInitial, isAdmin } = storeToRefs(auth)
+const { logout, fetchUser } = auth
 
 onMounted(async () => {
   if (!user.value) {

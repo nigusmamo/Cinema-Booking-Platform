@@ -18,13 +18,17 @@ const decodeRoleFromToken = (token: string): string | null => {
   }
 }
 
-export const useAuth = () => {
-  const user = useState<any>('auth_user', () => null)
-  const authCookie = useCookie('auth_token')
-  const { resolveClient } = useApolloClient()
-  const { onLogin, onLogout } = useApollo()
+export const useAuthStore = defineStore('auth', () => {
+  const user = ref<any>(null)
+
+  const isAuthenticated = computed(() => !!user.value)
+  const isAdmin = computed(() => !!user.value?.is_admin)
+  const userInitial = computed(() =>
+    user.value?.full_name ? user.value.full_name.charAt(0).toUpperCase() : '?'
+  )
 
   const fetchUser = async (explicitToken?: string) => {
+    const authCookie = useCookie('auth_token')
     const token = explicitToken || authCookie.value
     if (!token) {
       user.value = null
@@ -32,9 +36,9 @@ export const useAuth = () => {
     }
 
     try {
+      const { resolveClient } = useApolloClient()
       const client = resolveClient()
 
-      // 1. Fetch Basic Profile
       const { data } = await client.query({
         query: GET_ME,
         fetchPolicy: 'network-only',
@@ -56,47 +60,41 @@ export const useAuth = () => {
         user.value = null
       }
     } catch (err) {
-      console.error("Auth fetch error:", err)
+      console.error('Auth fetch error:', err)
       user.value = null
     }
   }
 
-  const setUser = (userData: any) => {
-    user.value = userData
+  const onLogin = async (token: string) => {
+    const { onLogin: apolloLogin } = useApollo()
+    await apolloLogin(token)
+  }
+
+  const onLogout = async () => {
+    const { onLogout: apolloLogout } = useApollo()
+    await apolloLogout()
   }
 
   const logout = async () => {
-    // 1. Clear Apollo Cache and Cookie
     await onLogout()
 
-    // 2. Clear Vue State
     user.value = null
     const userIdCookie = useCookie('user_id')
     userIdCookie.value = null
 
-    const { clearBooking } = useBookingStore()
-    clearBooking()
+    useBookingStore().clearBooking()
 
-    // 4. Redirect
     await navigateTo('/auth/login')
   }
 
-  const userInitial = computed(() => {
-    if (user.value?.full_name) {
-      return user.value.full_name.charAt(0).toUpperCase()
-    }
-    return '?'
-  })
-
   return {
     user,
+    isAuthenticated,
+    isAdmin,
+    userInitial,
     fetchUser,
-    setUser,
-    logout,
     onLogin,
     onLogout,
-    userInitial,
-    isAuthenticated: computed(() => !!user.value),
-    isAdmin: computed(() => !!user.value?.is_admin)
+    logout
   }
-}
+})

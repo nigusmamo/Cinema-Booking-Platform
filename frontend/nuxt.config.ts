@@ -7,13 +7,14 @@ export default defineNuxtConfig({
 
   modules: [
     '@nuxtjs/tailwindcss',
-    '@nuxtjs/apollo'
+    '@nuxtjs/apollo',
+    '@pinia/nuxt'
   ],
 
   apollo: {
     clients: {
       default: {
-        httpEndpoint: 'http://localhost:8080/v1/graphql',
+        httpEndpoint: process.env.GRAPHQL_HTTP_ENDPOINT || 'http://localhost:8080/v1/graphql',
         tokenName: 'auth_token'
       }
     }

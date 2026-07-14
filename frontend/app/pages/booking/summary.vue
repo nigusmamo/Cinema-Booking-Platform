@@ -84,11 +84,15 @@
 <script setup lang="ts">
 import { INITIATE_PAYMENT } from '~/graphql/movies'
 
-const { selectedMovie, selectedSeats, totalPrice, loadBooking } = useBookingStore()
+const booking = useBookingStore()
+const { selectedMovie, selectedSeats, totalPrice } = storeToRefs(booking)
+const { loadBooking } = booking
 const isProcessing = ref(false)
 const movieInfo = computed(() => selectedMovie.value as any)
 
-const { user, fetchUser } = useAuth()
+const auth = useAuthStore()
+const { user } = storeToRefs(auth)
+const { fetchUser } = auth
 const { resolveClient } = useApolloClient()
 const authCookie = useCookie('auth_token')
 

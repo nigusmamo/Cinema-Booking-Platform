@@ -254,7 +254,9 @@ import { GET_SCHEDULE_SEATS, GET_BOOKED_SEATS, GET_SEAT_PRICES } from '~/graphql
 
 const route = useRoute()
 const scheduleId = route.query.schedule_id
-const { saveBooking, loadBooking, selectedMovie: savedMovie, selectedSeats: savedSeats } = useBookingStore()
+const booking = useBookingStore()
+const { selectedMovie: savedMovie, selectedSeats: savedSeats } = storeToRefs(booking)
+const { saveBooking } = booking
 const authCookie = useCookie('auth_token')
 const showAuthModal = ref(false)
 
@@ -277,11 +279,12 @@ const alreadyBookedList = computed(() => {
 const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 const selectedSeats = ref<string[]>([])
 
+// Restore the in-progress selection when the user navigates back from the summary.
+// Reads only the in-memory store (not localStorage), so the selection survives back
+// navigation within the session but never sticks across a full reload / new session.
 onMounted(() => {
-  loadBooking()
   if (savedMovie.value?.schedule_id === scheduleId && savedSeats.value.length > 0) {
-    const available = savedSeats.value.filter((s: string) => !alreadyBookedList.value.includes(s))
-    selectedSeats.value = available
+    selectedSeats.value = savedSeats.value.filter((s: string) => !alreadyBookedList.value.includes(s))
   }
 })
 
@@ -341,9 +344,7 @@ const goToAuth = (path: string) => {
       totalPrice.value
     )
   }
-  if (import.meta.client) {
-    localStorage.setItem('cinema_redirect_after_login', '/booking/summary')
-  }
+  booking.redirectAfterLogin = '/booking/summary'
   navigateTo(path)
 }
 </script>
