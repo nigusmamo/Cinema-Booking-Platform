@@ -56,7 +56,10 @@ const email = ref('')
 const password = ref('')
 const isLoggingIn = ref(false)
 const errorMessage = ref('')
-const { fetchUser, isAdmin, onLogin } = useAuth()
+const auth = useAuthStore()
+const { isAdmin } = storeToRefs(auth)
+const { fetchUser, onLogin, onLogout } = auth
+const booking = useBookingStore()
 
 const handleLogin = async () => {
   if (!email.value || !password.value) {
@@ -69,10 +72,9 @@ const handleLogin = async () => {
 
   try {
     const { $apollo } = useNuxtApp()
-    const { onLogout, user } = useAuth()
 
     await onLogout()
-    user.value = null
+    auth.user = null
 
     const result = await $apollo.defaultClient.mutate({
       mutation: LOGIN_MUTATION,
@@ -92,9 +94,9 @@ const handleLogin = async () => {
 
       await fetchUser(token)
 
-      const pendingRedirect = import.meta.client ? localStorage.getItem('cinema_redirect_after_login') : null
+      const pendingRedirect = booking.redirectAfterLogin
       if (pendingRedirect) {
-        localStorage.removeItem('cinema_redirect_after_login')
+        booking.redirectAfterLogin = null
         await navigateTo(pendingRedirect)
       } else if (isAdmin.value) {
         await navigateTo('/admin')

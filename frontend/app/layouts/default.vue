@@ -52,7 +52,9 @@
 </template>
 
 <script setup lang="ts">
-const { user, userInitial, isAuthenticated, isAdmin, fetchUser } = useAuth()
+const auth = useAuthStore()
+const { user, userInitial, isAuthenticated, isAdmin } = storeToRefs(auth)
+const { fetchUser } = auth
 
 onMounted(() => {
   if (!user.value) {

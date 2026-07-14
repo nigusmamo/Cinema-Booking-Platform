@@ -237,7 +237,7 @@
 import { GET_HOME_PAGE_DATA } from '~/graphql/movies'
 
 const { data, pending } = await useAsyncQuery<any>(GET_HOME_PAGE_DATA)
-const { isAdmin } = useAuth()
+const { isAdmin } = storeToRefs(useAuthStore())
 
 const heroSection = ref<HTMLElement | null>(null)
 let heroObserver: IntersectionObserver | null = null

@@ -1,8 +1,8 @@
-// app/composables/useBooking.ts
-export const useBookingStore = () => {
-  const selectedMovie = useState<any>('selected_movie', () => null)
-  const selectedSeats = useState<string[]>('selected_seats', () => [])
-  const totalPrice = useState<number>('total_price', () => 0)
+export const useBookingStore = defineStore('booking', () => {
+  const selectedMovie = ref<any>(null)
+  const selectedSeats = ref<string[]>([])
+  const totalPrice = ref(0)
+  const redirectAfterLogin = ref<string | null>(null)
 
   const saveBooking = (movieData: any, seats: string[], price: number) => {
     selectedMovie.value = movieData
@@ -10,8 +10,7 @@ export const useBookingStore = () => {
     totalPrice.value = price
 
     if (import.meta.client) {
-      const cleanData = JSON.stringify({ movie: movieData, seats, price })
-      localStorage.setItem('cinema_booking_storage', cleanData)
+      localStorage.setItem('cinema_booking_storage', JSON.stringify({ movie: movieData, seats, price }))
     }
   }
 
@@ -42,8 +41,9 @@ export const useBookingStore = () => {
     selectedMovie,
     selectedSeats,
     totalPrice,
+    redirectAfterLogin,
     saveBooking,
     loadBooking,
     clearBooking
   }
-}
+})

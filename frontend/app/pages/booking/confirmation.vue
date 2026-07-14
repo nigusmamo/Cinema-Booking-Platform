@@ -229,8 +229,12 @@
 <script setup lang="ts">
 import { CREATE_BOOKING } from '~/graphql/movies'
 
-const { selectedMovie: storeMovie, selectedSeats: storeSeats, totalPrice: storePrice, loadBooking, clearBooking } = useBookingStore()
-const { user, fetchUser } = useAuth()
+const booking = useBookingStore()
+const { selectedMovie: storeMovie, selectedSeats: storeSeats, totalPrice: storePrice } = storeToRefs(booking)
+const { loadBooking, clearBooking } = booking
+const auth = useAuthStore()
+const { user } = storeToRefs(auth)
+const { fetchUser } = auth
 
 // Local display snapshots — populated from store before clearBooking() wipes reactive state
 const movieInfo = ref<any>(null)

@@ -87,7 +87,7 @@
 definePageMeta({ layout: 'admin' })
 import { GET_ADMIN_DASHBOARD } from '~/graphql/admin'
 
-const { user } = useAuth()
+const { user } = storeToRefs(useAuthStore())
 const { data, pending } = await useAsyncQuery<any>(GET_ADMIN_DASHBOARD)
 
 const icons = {

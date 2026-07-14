@@ -164,7 +164,9 @@
 <script setup lang="ts">
 import { GET_MY_PROFILE } from '~/graphql/movies'
 
-const { user, userInitial, logout, fetchUser } = useAuth()
+const auth = useAuthStore()
+const { user, userInitial } = storeToRefs(auth)
+const { logout, fetchUser } = auth
 const authCookie = useCookie('auth_token')
 const { resolveClient } = useApolloClient()
 
