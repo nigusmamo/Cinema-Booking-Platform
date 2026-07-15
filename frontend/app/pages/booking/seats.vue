@@ -273,15 +273,12 @@ const { data: seatPricesData } = await useAsyncQuery<any>(GET_SEAT_PRICES)
 const movie = computed(() => scheduleData.value?.schedules_by_pk?.movie)
 
 const alreadyBookedList = computed(() => {
-  return bookedData.value?.booking_seats.map((s: any) => s.seat_id) || []
+  return bookedData.value?.booked_seats.map((s: any) => s.seat_id) || []
 })
 
 const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 const selectedSeats = ref<string[]>([])
 
-// Restore the in-progress selection when the user navigates back from the summary.
-// Reads only the in-memory store (not localStorage), so the selection survives back
-// navigation within the session but never sticks across a full reload / new session.
 onMounted(() => {
   if (savedMovie.value?.schedule_id === scheduleId && savedSeats.value.length > 0) {
     selectedSeats.value = savedSeats.value.filter((s: string) => !alreadyBookedList.value.includes(s))

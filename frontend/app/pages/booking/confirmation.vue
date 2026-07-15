@@ -46,7 +46,7 @@
 
             <!-- Movie -->
             <div class="flex gap-5 items-start mb-6">
-              <img :src="movieInfo.main_image" referrerpolicy="no-referrer"
+              <img v-if="movieInfo.main_image" :src="movieInfo.main_image" referrerpolicy="no-referrer"
                 class="w-16 h-24 rounded-xl object-cover flex-shrink-0 border border-white/[0.06]" />
               <div class="min-w-0">
                 <p class="text-[9px] font-semibold tracking-[0.28em] text-[#EAB308]/70 uppercase mb-1">Now Playing</p>
@@ -58,7 +58,7 @@
             <div class="grid grid-cols-2 gap-5 mb-5">
               <div>
                 <p class="text-[9px] font-semibold tracking-[0.28em] text-white/25 uppercase mb-1.5">Ticket Holder</p>
-                <p class="text-white/80 text-[13px] font-medium">{{ user?.full_name || 'Guest' }}</p>
+                <p class="text-white/80 text-[13px] font-medium">{{ holderName }}</p>
               </div>
               <div>
                 <p class="text-[9px] font-semibold tracking-[0.28em] text-white/25 uppercase mb-1.5">Reference</p>
@@ -172,7 +172,7 @@
           <div class="print-row">
             <div class="print-field">
               <div class="print-label">TICKET HOLDER</div>
-              <div class="print-value">{{ user?.full_name || 'Guest' }}</div>
+              <div class="print-value">{{ holderName }}</div>
             </div>
             <div class="print-field">
               <div class="print-label">BOOKING REFERENCE</div>
@@ -227,25 +227,24 @@
 </template>
 
 <script setup lang="ts">
-import { CREATE_BOOKING } from '~/graphql/movies'
+import { VERIFY_PAYMENT } from '~/graphql/movies'
 
 const booking = useBookingStore()
-const { selectedMovie: storeMovie, selectedSeats: storeSeats, totalPrice: storePrice } = storeToRefs(booking)
+const { selectedMovie: storeMovie } = storeToRefs(booking)
 const { loadBooking, clearBooking } = booking
-const auth = useAuthStore()
-const { user } = storeToRefs(auth)
-const { fetchUser } = auth
 
-// Local display snapshots — populated from store before clearBooking() wipes reactive state
+const route = useRoute()
+const { resolveClient } = useApolloClient()
+
+// Ticket data — populated ONLY from the verified backend response.
 const movieInfo = ref<any>(null)
 const localSeats = ref<string[]>([])
 const totalPrice = ref(0)
+const holderName = ref('Guest')
+const bookingRef = ref('')
 
 const isSaving = ref(true)
 const errorMessage = ref('')
-const bookingRef = ref('')
-
-const { resolveClient } = useApolloClient()
 
 const getSeatType = (seatId: string): 'VIP' | 'Couple' | 'Standard' => {
   const row = seatId.charAt(0).toUpperCase()
@@ -274,61 +273,54 @@ const qrData = computed(() => {
     'ETHIO CINEMA HOUSE',
     `REF: ${bookingRef.value}`,
     `MOVIE: ${movieInfo.value?.title || ''}`,
-    `HOLDER: ${user.value?.full_name || 'Guest'}`,
+    `HOLDER: ${holderName.value}`,
     `SEATS: ${seatsStr}`,
     `TOTAL: ${totalPrice.value?.toLocaleString()} ETB`
   ].join('\n')
 })
 
 onMounted(async () => {
-  const hasData = loadBooking()
-  await fetchUser()
+  
+  loadBooking()
+  const posterImage = storeMovie.value?.main_image ?? null
 
-  if (!hasData || !storeMovie.value) {
+  const txRef = route.query.tx_ref as string | undefined
+  if (!txRef) {
     isSaving.value = false
-    errorMessage.value = "No booking information found."
+    errorMessage.value = "No payment reference found."
     return
   }
 
-  // Snapshot store data into local refs before clearBooking() resets the store
-  movieInfo.value = { ...storeMovie.value }
-  localSeats.value = [...storeSeats.value]
-  totalPrice.value = storePrice.value
-
   try {
-    const client = resolveClient()
     const authCookie = useCookie('auth_token')
-    const userIdCookie = useCookie('user_id')
-
-    if (!authCookie.value || !userIdCookie.value) {
+    if (!authCookie.value) {
       throw new Error("User session not found. Please log in.")
     }
 
+    const client = resolveClient()
     const { data } = await client.mutate({
-      mutation: CREATE_BOOKING,
-      variables: {
-        object: {
-          schedule_id: movieInfo.value.schedule_id || movieInfo.value.id,
-          total_price: totalPrice.value,
-          booking_reference: "CINE-" + Math.floor(Math.random() * 900000 + 100000),
-          payment_status: "completed",
-          booking_seats: {
-            data: localSeats.value.map(seatId => ({ seat_id: seatId }))
-          }
-        }
-      },
+      mutation: VERIFY_PAYMENT,
+      variables: { tx_ref: txRef },
       context: {
         headers: { Authorization: `Bearer ${authCookie.value}` }
       }
     })
 
-    if (data?.insert_bookings_one) {
-      bookingRef.value = data.insert_bookings_one.booking_reference
-      clearBooking()
+    const result = data?.verify_payment
+    if (!result || result.status !== 'completed') {
+      throw new Error("Payment could not be verified.")
     }
+
+    bookingRef.value = result.booking_reference
+    holderName.value = result.full_name
+    localSeats.value = result.seats ?? []
+    totalPrice.value = Number(result.total_price)
+    movieInfo.value = { title: result.movie_title, main_image: posterImage }
+
+    clearBooking()
   } catch (err: any) {
-    console.error("Save error:", err)
-    errorMessage.value = err.message || "Database update failed."
+    console.error("Verification error:", err)
+    errorMessage.value = err.message || "Payment verification failed."
   } finally {
     isSaving.value = false
   }

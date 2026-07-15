@@ -23,3 +23,14 @@ type PaymentOutput struct {
 	CheckoutURL string `json:"checkout_url"`
 	TxRef       string `json:"tx_ref"`
 }
+
+// ChapaVerifyResponse is the shape returned by Chapa's transaction verify API.
+type ChapaVerifyResponse struct {
+	Message string `json:"message"`
+	Status  string `json:"status"`
+	Data    struct {
+		Status string  `json:"status"`
+		Amount float64 `json:"amount"`
+		TxRef  string  `json:"tx_ref"`
+	} `json:"data"`
+}

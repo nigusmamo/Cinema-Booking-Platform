@@ -3,6 +3,9 @@ actions:
     definition:
       kind: synchronous
       handler: http://host.docker.internal:8000/auth/login
+      headers:
+        - name: X-Hasura-Action-Secret
+          value_from_env: ACTION_SECRET
     permissions:
       - role: anonymous
     comment: login
@@ -10,6 +13,9 @@ actions:
     definition:
       kind: synchronous
       handler: http://host.docker.internal:8000/payment/initialize
+      headers:
+        - name: X-Hasura-Action-Secret
+          value_from_env: ACTION_SECRET
     permissions:
       - role: user
     comment: pay
@@ -17,13 +23,29 @@ actions:
     definition:
       kind: synchronous
       handler: http://host.docker.internal:8000/auth/signup
+      headers:
+        - name: X-Hasura-Action-Secret
+          value_from_env: ACTION_SECRET
     permissions:
       - role: anonymous
     comment: signup
+  - name: verify_payment
+    definition:
+      kind: synchronous
+      handler: http://host.docker.internal:8000/payment/verify
+      headers:
+        - name: X-Hasura-Action-Secret
+          value_from_env: ACTION_SECRET
+    permissions:
+      - role: user
+    comment: verify_payment
   - name: get_upload_signature
     definition:
       kind: synchronous
       handler: http://host.docker.internal:8000/upload/signature
+      headers:
+        - name: X-Hasura-Action-Secret
+          value_from_env: ACTION_SECRET
     permissions:
       - role: admin
       - role: user
@@ -36,4 +58,5 @@ custom_types:
     - name: SignupOutput
     - name: PaymentOutput
     - name: UploadSignatureOutput
+    - name: VerifyPaymentOutput
   scalars: []

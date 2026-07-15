@@ -116,11 +116,6 @@ export const GET_SCHEDULE_SEATS = gql`
         main_image
         duration_minutes
       }
-      bookings {
-        booking_seats {
-          seat_id
-        }
-      }
     }
   }
 `;
@@ -136,12 +131,7 @@ export const GET_SEAT_PRICES = gql`
 
 export const GET_BOOKED_SEATS = gql`
   query GetBookedSeats($schedule_id: uuid!) {
-    booking_seats(where: { 
-      booking: { 
-        schedule_id: { _eq: $schedule_id }, 
-        payment_status: { _eq: "completed" } 
-      } 
-    }) {
+    booked_seats(where: { schedule_id: { _eq: $schedule_id } }) {
       seat_id
     }
   }
@@ -149,19 +139,24 @@ export const GET_BOOKED_SEATS = gql`
 
 
 export const INITIATE_PAYMENT = gql`
-  mutation InitiatePayment($amount: String!, $email: String!, $first_name: String!, $last_name: String!) {
-    pay(amount: $amount, email: $email, first_name: $first_name, last_name: $last_name) {
+  mutation InitiatePayment($schedule_id: String!, $seat_ids: [String!]!, $email: String!, $first_name: String!, $last_name: String!) {
+    pay(schedule_id: $schedule_id, seat_ids: $seat_ids, email: $email, first_name: $first_name, last_name: $last_name) {
       checkout_url
       tx_ref
     }
   }
 `;
 
-export const CREATE_BOOKING = gql`
-  mutation CreateBooking($object: bookings_insert_input!) {
-    insert_bookings_one(object: $object) {
-      id
+export const VERIFY_PAYMENT = gql`
+  mutation VerifyPayment($tx_ref: String!) {
+    verify_payment(tx_ref: $tx_ref) {
+      status
       booking_reference
+      total_price
+      movie_title
+      start_time
+      full_name
+      seats
     }
   }
 `;
