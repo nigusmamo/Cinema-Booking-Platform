@@ -120,7 +120,8 @@ const payWithChapa = async () => {
     const { data } = await client.mutate({
       mutation: INITIATE_PAYMENT,
       variables: {
-        amount: totalPrice.value.toString(),
+        schedule_id: movieInfo.value?.schedule_id,
+        seat_ids: selectedSeats.value,
         email: user.value.email,
         first_name: fName,
         last_name: lName

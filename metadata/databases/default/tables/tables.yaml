@@ -1,3 +1,4 @@
+- "!include public_booked_seats.yaml"
 - "!include public_booking_seats.yaml"
 - "!include public_bookings.yaml"
 - "!include public_bookmarks.yaml"

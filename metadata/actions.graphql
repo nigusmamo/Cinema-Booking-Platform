@@ -7,11 +7,18 @@ type Mutation {
 
 type Mutation {
   pay(
-    amount: String!
+    schedule_id: String!
+    seat_ids: [String!]!
     email: String!
     first_name: String!
     last_name: String!
   ): PaymentOutput
+}
+
+type Mutation {
+  verify_payment(
+    tx_ref: String!
+  ): VerifyPaymentOutput
 }
 
 type Mutation {
@@ -41,6 +48,16 @@ type SignupOutput {
 type PaymentOutput {
   checkout_url: String!
   tx_ref: String!
+}
+
+type VerifyPaymentOutput {
+  status: String!
+  booking_reference: String!
+  total_price: String!
+  movie_title: String!
+  start_time: String!
+  full_name: String!
+  seats: [String!]!
 }
 
 type UploadSignatureOutput {

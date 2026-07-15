@@ -33,6 +33,8 @@ services:
       HASURA_GRAPHQL_ADMIN_SECRET: ${HASURA_GRAPHQL_ADMIN_SECRET}
       HASURA_GRAPHQL_DEV_MODE: "true"
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
+      # Shared secret Hasura sends with every Action call; verified by the Go backend.
+      ACTION_SECRET: ${ACTION_SECRET}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
